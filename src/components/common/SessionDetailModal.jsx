@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiX, FiChevronLeft, FiChevronRight, FiCopy, FiCheck } from "react-icons/fi";
 import "./SessionDetailModal.css";
 
 function renderText(text) {
@@ -14,6 +14,17 @@ function renderText(text) {
 
 export default function SessionDetailModal({ sessionData, selectedIndex, totalSessions, onPrevSession, onNextSession, onClose }) {
   const [openToken, setOpenToken] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyUserId = (userId) => {
+    if (userId) {
+      navigator.clipboard.writeText(userId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const isPublicOrGuest = !sessionData?.userId || sessionData?.userId === "public" || sessionData?.users === "guest";
 
   return (
     <div className="session-modal-backdrop" onClick={onClose}>
@@ -33,7 +44,26 @@ export default function SessionDetailModal({ sessionData, selectedIndex, totalSe
 
         <div className="session-meta-grid">
           {[
-            { label: "User", value: sessionData?.users },
+            { 
+              label: "User", 
+              value: (
+                <div className="user-meta-val">
+                  <span>{sessionData?.users}</span>
+                  {!isPublicOrGuest && sessionData?.userId && (
+                    <div className="user-id-wrapper">
+                      <span className="user-id-code" title={sessionData.userId}>{sessionData.userId}</span>
+                      <button 
+                        className="copy-user-id-btn" 
+                        onClick={() => handleCopyUserId(sessionData.userId)}
+                        title="Copy User ID"
+                      >
+                        {copied ? <FiCheck size={12} className="copied-icon" /> : <FiCopy size={12} />}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            },
             { label: "Institute", value: sessionData?.instituteId },
             { label: "Platform", value: sessionData?.platformType },
             { label: "Device", value: "Desktop" },
