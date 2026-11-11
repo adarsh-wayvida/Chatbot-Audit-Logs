@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import Footer from "./Footer";
 import ChatbotAuditLog from "../../pages/ChatbotAuditLog";
 import "./AdminLayout.css";
 
@@ -19,6 +20,7 @@ export default function AdminLayout({ children }) {
               <img src="/main-container.png" alt="Wayvida Dashboard" />
             </div>
           )}
+          <Footer />
         </main>
       </div>
     </div>
