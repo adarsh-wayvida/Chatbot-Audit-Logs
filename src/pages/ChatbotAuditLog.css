@@ -163,6 +163,7 @@
   border-radius: 8px;
   background: #ffffff;
   position: relative;
+  clip-path: inset(0 round 8px);
 }
 
 .audit-table-container::-webkit-scrollbar {
@@ -234,6 +235,34 @@
 
 .audit-table tbody tr:hover td {
   background-color: #f8fafc;
+}
+
+.platform-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.platform-pill.marketplace {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+}
+
+.platform-pill.whitelabel {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.intent-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #f1f5f9;
+  color: #475569;
 }
 
 .status-pill {
@@ -414,6 +443,10 @@
 
 .input-with-clear .clear-icon:hover {
   color: #045c99;
+}
+
+.user-search-input {
+  width: 250px;
 }
 
 .filter-select, .filter-input {

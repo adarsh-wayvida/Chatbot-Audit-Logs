@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiX, FiChevronLeft, FiChevronRight, FiCopy, FiCheck } from "react-icons/fi";
+import { FiX, FiChevronLeft, FiChevronRight, FiCopy, FiCheck, FiMessageSquare, FiExternalLink } from "react-icons/fi";
 import chatbotAvatar from "../../assets/Opacity 20.svg";
 import "./SessionDetailModal.css";
 
@@ -119,9 +119,17 @@ export default function SessionDetailModal({ sessionData, selectedIndex, totalSe
                   </div>
                   {msg.options && (
                     <div className="quick-replies">
-                      {msg.options.map((q) => (
-                        <button key={q} className="quick-reply">{q}</button>
-                      ))}
+                      {msg.options.map((q) => {
+                        const optionText = typeof q === "string" ? q : q.label;
+                        const isLink = /view|open|app|play|browse|http|url/i.test(optionText);
+
+                        return (
+                          <button key={optionText} className="quick-reply">
+                            {isLink ? <FiExternalLink size={12} /> : <FiMessageSquare size={12} />}
+                            <span>{optionText}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                   {msg.tokens && (

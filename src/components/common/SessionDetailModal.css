@@ -338,13 +338,30 @@
 }
 
 .quick-reply {
-  border: 1px solid #38BDF8;
-  color: #0284C7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   background: #ffffff;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
+  border: 1px solid #38bdf8;
+  color: #0284c7;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
   cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.quick-reply svg {
+  flex-shrink: 0;
+  display: block;
+}
+
+.quick-reply:hover {
+  background: #e0f2fe;
+  border-color: #0284c7;
 }
 
 .token-usage-btn {
