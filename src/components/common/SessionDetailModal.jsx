@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FiX, FiChevronLeft, FiChevronRight, FiCopy, FiCheck } from "react-icons/fi";
+import chatbotAvatar from "../../assets/Opacity 20.svg";
 import "./SessionDetailModal.css";
 
 function renderText(text) {
@@ -14,98 +15,135 @@ function renderText(text) {
 
 export default function SessionDetailModal({ sessionData, selectedIndex, totalSessions, onPrevSession, onNextSession, onClose }) {
   const [openToken, setOpenToken] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState(null);
 
-  const handleCopyUserId = (userId) => {
-    if (userId) {
-      navigator.clipboard.writeText(userId);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const handleCopy = (value, field) => {
+    navigator.clipboard.writeText(value);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const isPublicOrGuest = !sessionData?.userId || sessionData?.userId === "public" || sessionData?.users === "guest";
+  const userId = sessionData?.userId || "";
+  const sessionId = sessionData?.sessionId || "";
 
   return (
     <div className="session-modal-backdrop" onClick={onClose}>
       <div className="session-modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="session-modal-header">
-          <div>
-            <h2 className="session-title">Session detail</h2>
-            <div className="uuid-subtitle">{sessionData?.fullSessionId || sessionData?.sessionId}</div>
-            <div className="session-nav">
-              <button className="session-nav-btn" onClick={onPrevSession} disabled={selectedIndex <= 0}><FiChevronLeft size={14} /> Previous session</button>
-              <span className="session-count">Session {selectedIndex + 1} of {totalSessions}</span>
-              <button className="session-nav-btn" onClick={onNextSession} disabled={selectedIndex >= totalSessions - 1}>Next session <FiChevronRight size={14} /></button>
+          <div className="header-row-1">
+            <div className="user-title-row">
+              <h2 className="user-title">{sessionData?.users || "User"} ({sessionData?.messages?.length || 0})</h2>
+              <span className="platform-badge">{sessionData?.platformType || "Whitelabel"}</span>
+              <span className="device-badge">Desktop</span>
+            </div>
+            <div className="header-right-controls">
+              <div className="top-session-nav">
+                <span className="session-count">Session {selectedIndex + 1} of {totalSessions}</span>
+                <div className="session-arrow-group">
+                  <button className="session-arrow-btn" onClick={onPrevSession} disabled={selectedIndex <= 0} title="Previous session">
+                    <FiChevronLeft size={18} />
+                  </button>
+                  <button className="session-arrow-btn" onClick={onNextSession} disabled={selectedIndex >= totalSessions - 1} title="Next session">
+                    <FiChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+              <button className="session-close-btn" onClick={onClose}><FiX size={18} /></button>
             </div>
           </div>
-          <button className="session-close-btn" onClick={onClose}><FiX size={18} /></button>
+          <div className="header-row-2">
+            <div className="sub-header">
+              <div className="id-chip">
+                <span>User ID</span>
+                <code>{userId}</code>
+                <button onClick={() => handleCopy(userId, "user")}>
+                  {copiedField === "user" ? <FiCheck size={12} /> : <FiCopy size={12} />}
+                </button>
+              </div>
+              <div className="id-chip">
+                <span>Session ID</span>
+                <code>{sessionId}</code>
+                <button onClick={() => handleCopy(sessionId, "session")}>
+                  {copiedField === "session" ? <FiCheck size={12} /> : <FiCopy size={12} />}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="session-meta-grid">
-          {[
-            { 
-              label: "User", 
-              value: (
-                <div className="user-meta-val">
-                  <span>{sessionData?.users}</span>
-                  {!isPublicOrGuest && sessionData?.userId && (
-                    <div className="user-id-wrapper">
-                      <span className="user-id-code" title={sessionData.userId}>{sessionData.userId}</span>
-                      <button 
-                        className="copy-user-id-btn" 
-                        onClick={() => handleCopyUserId(sessionData.userId)}
-                        title="Copy User ID"
-                      >
-                        {copied ? <FiCheck size={12} className="copied-icon" /> : <FiCopy size={12} />}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )
-            },
-            { label: "Institute", value: sessionData?.instituteId },
-            { label: "Platform", value: sessionData?.platformType },
-            { label: "Device", value: "Desktop" },
-            { label: "Created", value: sessionData?.datetime },
-            { label: "Total chats", value: sessionData?.messages?.length || 0 },
-            { label: "Avg duration", value: "2m 14s" },
-            { label: "Total tokens", value: "1,240" },
-          ].map((m) => (
-            <div key={m.label} className="meta-card">
-              <div className="meta-label">{m.label}</div>
-              <div className="meta-value">{m.value}</div>
-            </div>
-          ))}
+        <div className="meta-summary-bar">
+          <div className="meta-item">
+            <div className="meta-label">INSTITUTE ID</div>
+            <div className="meta-value">{sessionData?.instituteId}</div>
+          </div>
+          <div className="meta-item">
+            <div className="meta-label">PAGE NAME</div>
+            <div className="meta-value">{sessionData?.pageScreen}</div>
+          </div>
+          <div className="meta-item">
+            <div className="meta-label">CREATED AT</div>
+            <div className="meta-value">{sessionData?.datetime}</div>
+          </div>
+
+          <div className="meta-item">
+            <div className="meta-label">AVG LATENCY</div>
+            <div className="meta-value">2m 14s</div>
+          </div>
+          <div className="meta-item">
+            <div className="meta-label">TOTAL TOKENS</div>
+            <div className="meta-value">1,240</div>
+          </div>
         </div>
 
         <div className="chat-body-messages">
           {(sessionData?.messages || []).map((msg) => (
-            <div key={msg.id} className={`chat-msg ${msg.role === "user" ? "user-msg" : "assistant-msg"}`}>
-              <div className={`chat-badge ${msg.role === "user" ? "user-badge" : "assistant-badge"}`}>{msg.role === "user" ? "User" : "Assistant"}</div>
-              <div className="chat-meta">
-                {msg.timestamp}{msg.role === "user" ? ` • intent: ${msg.intent} • page: ${msg.page}` : ` • latency: ${msg.latency}`}
-              </div>
-              <div className="chat-text">{renderText(msg.text)}</div>
-              {msg.role === "assistant" && msg.options && (
-                <div className="quick-replies">
-                  {msg.options.map((q) => (
-                    <span key={q} className="quick-reply">{q}</span>
-                  ))}
+            msg.role === "user" ? (
+              <div key={msg.id} className="chat-row user-row">
+                <div className="user-bubble">
+                  <div className="user-text">{renderText(msg.text)}</div>
+                  <div className="user-meta">{msg.timestamp} ✓</div>
                 </div>
-              )}
-              {msg.role === "assistant" && msg.tokens && (
-                <details className="token-usage" open={openToken === msg.id} onClick={(e) => { e.preventDefault(); setOpenToken(openToken === msg.id ? null : msg.id); }}>
-                  <summary>Token usage</summary>
-                  <div className="token-details">Prompt: {msg.tokens.prompt} • Completion: {msg.tokens.completion} • Total: {msg.tokens.total}</div>
-                </details>
-              )}
-            </div>
+                <div className="msg-intent-under">intent: <span className="intent-highlight">{msg.intent}</span></div>
+              </div>
+            ) : (
+              <div key={msg.id} className="chat-row assistant-row">
+                <div className="assistant-avatar">
+                  <img src={chatbotAvatar} alt="Chatbot Avatar" className="chatbot-avatar-img" />
+                </div>
+                <div className="assistant-content">
+                  <div className="assistant-bubble">
+                    <div className="assistant-text">{renderText(msg.text)}</div>
+                  </div>
+                  <div className="assistant-meta">
+                    {msg.timestamp} • {msg.latency}
+                  </div>
+                  {msg.options && (
+                    <div className="quick-replies">
+                      {msg.options.map((q) => (
+                        <button key={q} className="quick-reply">{q}</button>
+                      ))}
+                    </div>
+                  )}
+                  {msg.tokens && (
+                    <div>
+                      <button className="token-usage-btn" onClick={() => setOpenToken(openToken === msg.id ? null : msg.id)}>
+                        Token usage {openToken === msg.id ? "▲" : "▼"}
+                      </button>
+                      {openToken === msg.id && (
+                        <div className="token-details">Prompt: {msg.tokens.prompt} • Completion: {msg.tokens.completion} • Total: {msg.tokens.total}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
           ))}
         </div>
 
-        <div className="session-modal-footer">
-          Messages page 1 / 1 • {sessionData?.messages?.length || 0} messages
+        <div className="modal-footer">
+          <div className="footer-right">
+            Messages page 1/1 • {sessionData?.messages?.length || 0} messages
+          </div>
         </div>
       </div>
     </div>
