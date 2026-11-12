@@ -1,395 +1,446 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FiX, FiChevronDown, FiRotateCcw, FiRefreshCw, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import DualMonthCalendar from "../components/common/DualMonthCalendar";
-import SessionDetailModal from "../components/common/SessionDetailModal";
+import React, { useState, useRef, useEffect } from "react";
+import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch } from "react-icons/fi";
+import { auditLogData, messagesMap } from "../data/auditLogMockData";
+import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
 
-const auditLogData = [
-  { datetime: "11 Nov 2026, 11:35:28 am", sessionId: "3e7bca6f-2ce-193caee3-9462-4327-a632", userId: "6853b34e34ed110441a82a98", users: "Sajan", instituteId: "Python Coaching Center", institute: "marketplace", intent: "greeting", pageScreen: "Course Listing Page", platformType: "Whitelabel", device: "Desktop" },
-  { datetime: "11 Nov 2026, 9:37:34 am", sessionId: "b65cdfff-d6e-7b0abe62-e566-4ae0-a10c", userId: "public", users: "guest", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Login Page"  , platformType: "Marketplace", device: "Android"},
-  { datetime: "11 Nov 2026, 9:37:30 am", sessionId: "aad2bc43-057-ef626968-a278-4831-b92e", userId: "public", users: "guest", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Home Page"  , platformType: "Marketplace", device: "iPhone"},
-  { datetime: "10 Nov 2026, 12:23:41 pm", sessionId: "56a9aa20-2b9-deea88a8-38d0-438d-ad7a", userId: "6af2ac5c09f6f71b892a014e", users: "cuser", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Home Page"  , platformType: "Marketplace", device: "Desktop"},
-  { datetime: "6 Nov 2026, 12:43:43 pm", sessionId: "9b12211f-70f-1396489d-9aca-4a19-acb7", userId: "68480b4ab596e8311a2f9810", users: "Developer C", instituteId: "Gaythri Tuition Center", institute: "marketplace", intent: "greeting", pageScreen: "Course Listing Page"  , platformType: "Whitelabel", device: "Android"},
-  { datetime: "6 Nov 2026, 10:28:11 am", sessionId: "e218994b-f10-ce6ad3c1-a0d1-475e-bbd7", userId: "6ae80e06a6e0c1f44390b12c", users: "auser", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Course Listing Page"  , platformType: "Marketplace", device: "iPhone"},
-  { datetime: "4 Nov 2026, 5:45:02 pm", sessionId: "2718bd6f-890-7861ba8e-2181-41a7-8cc6", userId: "6a43850da2abf17f89b9e143", users: "amalch", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Profile Details Page"  , platformType: "Marketplace", device: "iPhone"},
-  { datetime: "2 Nov 2026, 11:42:30 am", sessionId: "43842334-051-35962f1b-2a17-49fe-9f7b", userId: "66f69f8be795a28b9c6d3102", users: "Ratheesh Babu", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Requirements Page"  , platformType: "Marketplace", device: "Desktop"},
-  { datetime: "31 Oct 2026, 6:05:20 pm", sessionId: "107b843d-414-2f146aa1-a260-4514-8cbe", userId: "public", users: "guest", instituteId: "Python Coaching Center", institute: "marketplace", intent: "explore_course", pageScreen: "Course Details Page"  , platformType: "Whitelabel", device: "Android"},
-  { datetime: "31 Oct 2026, 6:01:45 pm", sessionId: "12003d85-365-c36b982c-6f6a-4033-9885", userId: "public", users: "guest", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Course Details Page"  , platformType: "Marketplace", device: "iPhone"},
-  { datetime: "31 Oct 2026, 6:01:07 pm", sessionId: "fb94d05a-f4a-3d8682fe-3195-49b7-b403", userId: "public", users: "guest", instituteId: "Wayvida", institute: "marketplace", intent: "explore_course", pageScreen: "Course Details Page"  , platformType: "Marketplace", device: "iPhone"},
-  { datetime: "31 Oct 2026, 3:46:08 pm", sessionId: "d8f59328-b15-9fbafe8d-4d13-4cc1-a02b", userId: "public", users: "guest", instituteId: "Wayvida", institute: "marketplace", intent: "creator", pageScreen: "Course Details Page"  , platformType: "Marketplace", device: "Desktop"},
-  { datetime: "31 Oct 2026, 3:43:45 pm", sessionId: "be7da0db-ef4-b79656f9-dce7-4f7a-9b7a", userId: "69e709ad5eb1082c351f77e4", users: "Manukrishna", instituteId: "ROE Institute", institute: "marketplace", intent: "creator", pageScreen: "Course Details Page"  , platformType: "Whitelabel", device: "Android"},
-  { datetime: "30 Oct 2026, 10:59:21 am", sessionId: "480d813e-cef-c391f58b-ac9f-4a2e-9dc5", userId: "public", users: "guest", instituteId: "Python Coaching Center", institute: "marketplace", intent: "greeting", pageScreen: "Home Page"  , platformType: "Whitelabel", device: "iPhone"},
-  { datetime: "28 Oct 2026, 2:24:40 pm", sessionId: "f4f0407f-11e-b746caee-6d22-4ac1-b82a", userId: "6a6c78856d39d91f20b4105a", users: "Daliya C Abraham", instituteId: "Wayvida", institute: "marketplace", intent: "my_content", pageScreen: "Course Details Page"  , platformType: "Marketplace", device: "Desktop"},
-  { datetime: "28 Oct 2026, 12:27:26 pm", sessionId: "14da506d-7b2-43a2d945-8e72-4ea2-b00f", userId: "69e709ad5eb1082c351f77e4", users: "Manukrishna", instituteId: "ROE Institute", institute: "marketplace", intent: "creator", pageScreen: "Pricing Page"  , platformType: "Whitelabel", device: "Android"},
-  { datetime: "27 Oct 2026, 4:47:52 pm", sessionId: "7a5f90bf-ebd-32cdfdfd-15f5-4a93-acbb", userId: "6ae0871fb52194c7b8109d3e", users: "coursenls", instituteId: "Wayvida", institute: "marketplace", intent: "explore_course", pageScreen: "Course Details Page"  , platformType: "Marketplace", device: "iPhone"},
-  { datetime: "27 Oct 2026, 3:54:11 pm", sessionId: "11e786ea-19e-6b080ac4-a386-4a56-b013", userId: "6a6c78856d39d91f20b4105a", users: "Daliya C Abraham", instituteId: "Wayvida", institute: "marketplace", intent: "ambiguous", pageScreen: "Home Page"  , platformType: "Marketplace", device: "Desktop"},
-  { datetime: "27 Oct 2026, 2:35:01 pm", sessionId: "f051bfcf-de6-98a34a0a-94f5-48e0-9f23", userId: "public", users: "guest", instituteId: "Wayvida", institute: "marketplace", intent: "greeting", pageScreen: "Home Page", platformType: "Marketplace", device: "Android" }
-];
-
-const messagesMap = {
-  "3e7bca6f-2ce...": [
-    { id: 1, role: "user", timestamp: "11 Nov 2026, 11:35:28 am", text: "Hi", intent: "greeting", page: "Course Listing Page" },
-    { id: 2, role: "assistant", timestamp: "11 Nov 2026, 11:35:29 am", latency: "120 ms", text: "Hi Sajan! Looking for PSC exam bundles?", options: ["View bundles", "Compare plans"], tokens: { prompt: 100, completion: 40, total: 140 } },
-    { id: 3, role: "user", timestamp: "11 Nov 2026, 11:36:00 am", text: "show bundles", intent: "explore_course", page: "Course Listing Page" },
-    { id: 4, role: "assistant", timestamp: "11 Nov 2026, 11:36:02 am", latency: "340 ms", text: "Here are the top PSC bundles with discounts.", options: ["Buy now"], tokens: { prompt: 200, completion: 90, total: 290 } },
-  ],
-  "b65cdfff-d6e...": [
-    { id: 1, role: "user", timestamp: "11 Nov 2026, 9:37:34 am", text: "login help", intent: "greeting", page: "Login Page" },
-    { id: 2, role: "assistant", timestamp: "11 Nov 2026, 9:37:35 am", latency: "59 ms", text: "I can help with login. Did you forget your password?", options: ["Reset password", "Request OTP"], tokens: { prompt: 80, completion: 30, total: 110 } },
-    { id: 3, role: "user", timestamp: "11 Nov 2026, 9:37:50 am", text: "request otp", intent: "otp", page: "Login Page" },
-    { id: 4, role: "assistant", timestamp: "11 Nov 2026, 9:37:52 am", latency: "210 ms", text: "OTP sent to your registered email.", options: [], tokens: { prompt: 60, completion: 20, total: 80 } },
-  ],
-  "aad2bc43-057...": [
-    { id: 1, role: "user", timestamp: "11 Nov 2026, 9:37:30 am", text: "hi", intent: "greeting", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "11 Nov 2026, 9:37:31 am", latency: "45 ms", text: "Welcome to Wayvida! How can I assist?", options: ["Browse courses", "Webinars"], tokens: { prompt: 70, completion: 25, total: 95 } },
-  ],
-  "56a9aa20-2b9...": [
-    { id: 1, role: "user", timestamp: "10 Nov 2026, 12:23:41 pm", text: "join as educator", intent: "creator", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "10 Nov 2026, 12:23:45 pm", latency: "8000 ms", text: "Enterprise plan is best for serious teaching business.", options: ["Open plans"], tokens: { prompt: 480, completion: 210, total: 690 } },
-  ],
-  "9b12211f-70f...": [
-    { id: 1, role: "user", timestamp: "6 Nov 2026, 12:43:43 pm", text: "api access", intent: "api", page: "Course Listing Page" },
-    { id: 2, role: "assistant", timestamp: "6 Nov 2026, 12:43:44 pm", latency: "100 ms", text: "Developer API docs are available in settings.", options: ["Open docs"], tokens: { prompt: 90, completion: 40, total: 130 } },
-  ],
-  "e218994b-f10...": [
-    { id: 1, role: "user", timestamp: "6 Nov 2026, 10:28:11 am", text: "teaching tips", intent: "greeting", page: "Course Listing Page" },
-    { id: 2, role: "assistant", timestamp: "6 Nov 2026, 10:28:12 am", latency: "200 ms", text: "Here are faculty listings and teaching resources.", options: ["Browse"], tokens: { prompt: 110, completion: 50, total: 160 } },
-  ],
-  "2718bd6f-890...": [
-    { id: 1, role: "user", timestamp: "4 Nov 2026, 5:45:02 pm", text: "update profile", intent: "profile", page: "Profile Details Page" },
-    { id: 2, role: "assistant", timestamp: "4 Nov 2026, 5:45:03 pm", latency: "150 ms", text: "You can update email and notifications in settings.", options: ["Open settings"], tokens: { prompt: 95, completion: 45, total: 140 } },
-  ],
-  "43842334-051...": [
-    { id: 1, role: "user", timestamp: "2 Nov 2026, 11:42:30 am", text: "custom app setup", intent: "requirements", page: "Requirements Page" },
-    { id: 2, role: "assistant", timestamp: "2 Nov 2026, 11:42:35 am", latency: "5000 ms", text: "Gathering requirements for your custom app.", options: ["Continue"], tokens: { prompt: 300, completion: 150, total: 450 } },
-  ],
-  "107b843d-414...": [
-    { id: 1, role: "user", timestamp: "31 Oct 2026, 6:05:20 pm", text: "course duration?", intent: "explore_course", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 6:05:21 pm", latency: "180 ms", text: "This course runs 12 weeks with free trial.", options: ["Enroll"], tokens: { prompt: 100, completion: 50, total: 150 } },
-  ],
-  "12003d85-365...": [
-    { id: 1, role: "user", timestamp: "31 Oct 2026, 6:01:45 pm", text: "certificate?", intent: "greeting", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 6:01:46 pm", latency: "120 ms", text: "Certificates available on completion.", options: ["View"], tokens: { prompt: 80, completion: 30, total: 110 } },
-  ],
-  "fb94d05a-f4a...": [
-    { id: 1, role: "user", timestamp: "31 Oct 2026, 6:01:07 pm", text: "instructor qualifications?", intent: "explore_course", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 6:01:08 pm", latency: "140 ms", text: "Our instructors are industry experts.", options: ["View profiles"], tokens: { prompt: 90, completion: 40, total: 130 } },
-  ],
-  "d8f59328-b15...": [
-    { id: 1, role: "user", timestamp: "31 Oct 2026, 3:46:08 pm", text: "refund policy", intent: "creator", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 3:46:09 pm", latency: "160 ms", text: "7-day refund on all courses.", options: ["Read policy"], tokens: { prompt: 85, completion: 35, total: 120 } },
-  ],
-  "be7da0db-ef4...": [
-    { id: 1, role: "user", timestamp: "31 Oct 2026, 3:43:45 pm", text: "creator studio tools", intent: "creator", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 3:43:46 pm", latency: "200 ms", text: "Studio supports video upload up to 2GB.", options: ["Open studio"], tokens: { prompt: 100, completion: 45, total: 145 } },
-  ],
-  "480d813e-cef...": [
-    { id: 1, role: "user", timestamp: "30 Oct 2026, 10:59:21 am", text: "mobile app", intent: "greeting", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "30 Oct 2026, 10:59:22 am", latency: "90 ms", text: "Download Wayvida app on iOS and Android.", options: ["App Store", "Play Store"], tokens: { prompt: 70, completion: 30, total: 100 } },
-  ],
-  "f4f0407f-11e...": [
-    { id: 1, role: "user", timestamp: "28 Oct 2026, 2:24:40 pm", text: "content access", intent: "my_content", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "28 Oct 2026, 2:24:41 pm", latency: "130 ms", text: "Your enrolled content is under My Courses.", options: ["Open"], tokens: { prompt: 85, completion: 35, total: 120 } },
-  ],
-  "14da506d-7b2...": [
-    { id: 1, role: "user", timestamp: "28 Oct 2026, 12:27:26 pm", text: "pricing plans", intent: "creator", page: "Pricing Page" },
-    { id: 2, role: "assistant", timestamp: "28 Oct 2026, 12:27:27 pm", latency: "150 ms", text: "Yearly vs monthly comparison available.", options: ["Compare"], tokens: { prompt: 95, completion: 40, total: 135 } },
-  ],
-  "7a5f90bf-ebd...": [
-    { id: 1, role: "user", timestamp: "27 Oct 2026, 4:47:52 pm", text: "webinar hosting", intent: "explore_course", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "27 Oct 2026, 4:47:53 pm", latency: "170 ms", text: "Webinar quota depends on plan.", options: ["View plans"], tokens: { prompt: 90, completion: 40, total: 130 } },
-  ],
-  "11e786ea-19e...": [
-    { id: 1, role: "user", timestamp: "27 Oct 2026, 3:54:11 pm", text: "help", intent: "ambiguous", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "27 Oct 2026, 3:54:12 pm", latency: "110 ms", text: "Routing you to helpdesk.", options: ["Contact"], tokens: { prompt: 75, completion: 30, total: 105 } },
-  ],
-  "f051bfcf-de6...": [
-    { id: 1, role: "user", timestamp: "27 Oct 2026, 2:35:01 pm", text: "hi", intent: "greeting", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "27 Oct 2026, 2:35:02 pm", latency: "60 ms", text: "Welcome to Wayvida platform features.", options: ["Explore"], tokens: { prompt: 70, completion: 30, total: 100 } },
-  ],
+const getUserAvatar = (name) => {
+  if (!name || name === "guest") return null;
+  const males = ["Sajan", "Manukrishna", "Ratheesh Babu", "amalch", "cuser", "Developer C", "auser", "coursenls"];
+  const isMale = males.includes(name);
+  const malePhotos = [
+    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
+  ];
+  const femalePhotos = [
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+  ];
+  const pool = isMale ? malePhotos : femalePhotos;
+  const idx = name.length % pool.length;
+  return pool[idx];
 };
 
-export default function ChatbotAuditLog() {
-  const filterRef = useRef(null);
+const getLastMessageText = (session) => {
+  const msgs = session.messages || messagesMap[session.sessionId] || [];
+  if (msgs.length === 0) return session.intent || "No messages";
+  const lastMsg = msgs[msgs.length - 1];
+  return lastMsg.text;
+};
+
+// Custom Dropdown Pill Component (Matches Image 1 style perfectly)
+function CustomDropdownPill({ label, options, selectedValue, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
-        setIsPlatformOpen(false);
-        setIsUserTypeOpen(false);
-        setIsInstituteOpen(false);
-        setIsLimitOpen(false);
-        setIsDateOpen(false);
-        setShowDualCal(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const [platform, setPlatform] = useState("All Platform");
-  const [isPlatformOpen, setIsPlatformOpen] = useState(false);
-
-  const [userType, setUserType] = useState("All User Type");
-  const [isUserTypeOpen, setIsUserTypeOpen] = useState(false);
-
-  const [instituteId, setInstituteId] = useState("");
-  const [isInstituteOpen, setIsInstituteOpen] = useState(false);
-  const [userId, setUserId] = useState("");
-
-  const [recordsPerPage, setRecordsPerPage] = useState("50");
-  const [isRecordsOpen, setIsRecordsOpen] = useState(false);
-
-  const [dateLabel, setDateLabel] = useState("Date");
-  const [selectedSessionIndex, setSelectedSessionIndex] = useState(null);
-  const [isDateOpen, setIsDateOpen] = useState(false);
-  const [showDualCal, setShowDualCal] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-
-  const presets = ["Today", "Yesterday", "This Week", "Last Week", "This Month", "Last Month", "This Year", "Last Year"];
-
-  const handleClearAll = () => {
-    setPlatform("");
-    setUserType("");
-    setInstituteId("");
-    setUserId("");
-    setDateLabel("Date");
-    setStartDate("");
-    setEndDate("");
-    setRecordsPerPage("50");
-    setIsPlatformOpen(false);
-    setIsUserTypeOpen(false);
-    setIsInstituteOpen(false);
-    setIsDateOpen(false);
-    setShowDualCal(false);
-  };
-
-  const closeAll = () => {
-    setIsPlatformOpen(false);
-    setIsUserTypeOpen(false);
-    setIsLimitOpen(false);
-    setIsDateOpen(false);
-    setShowDualCal(false);
-  };
-
-  const defaultMessages = [
-    { id: 1, role: "user", timestamp: "26 Oct 2026, 12:46:52 pm", text: "Hi", intent: "greeting", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "26 Oct 2026, 12:46:52 pm", latency: "59 ms", text: "Hi! How can I help you today on Wayvida?", options: ["Find a course", "Browse webinars", "My courses"], tokens: { prompt: 120, completion: 45, total: 165 } },
-    { id: 3, role: "user", timestamp: "26 Oct 2026, 12:47:21 pm", text: "join as educator", intent: "creator", page: "Home Page" },
-    { id: 4, role: "assistant", timestamp: "26 Oct 2026, 12:47:26 pm", latency: "8479 ms", text: "If you're joining as an educator, the yearly flat-rate view shows **Enterprise** as the highest current membership tier, and it's the best fit when you want platform features for a serious teaching business.", options: ["Open plans"], tokens: { prompt: 480, completion: 210, total: 690 } },
-    { id: 5, role: "user", timestamp: "26 Oct 2026, 12:48:10 pm", text: "what is the price of professional plan?", intent: "pricing", page: "Pricing Page" },
-    { id: 6, role: "assistant", timestamp: "26 Oct 2026, 12:48:15 pm", latency: "13535 ms", text: "Based on what you want to do, the **Professional Plan** looks like the best fit. It is priced at ₹149,999/year with 0% commission.", options: ["View plans"], tokens: { prompt: 510, completion: 320, total: 830 } },
-    { id: 7, role: "user", timestamp: "26 Oct 2026, 12:49:01 pm", text: "do you have white label upgrade?", intent: "whitelabel", page: "Pricing Page" },
-    { id: 8, role: "assistant", timestamp: "26 Oct 2026, 12:49:05 pm", latency: "3210 ms", text: "Yes! You have a white-label upgrade option if you need your own branded app or website.", options: ["Contact team"], tokens: { prompt: 290, completion: 110, total: 400 } },
-  ];
-
-  const filteredLogs = auditLogData.filter((item) => {
-    if (platform && platform !== "" && platform !== "All Platform" && item.platformType !== platform) return false;
-    if (userType && userType !== "" && userType !== "All User Type") {
-      if (userType.toLowerCase() === "guest" && item.users.toLowerCase() !== "guest") return false;
-      if (userType.toLowerCase() === "users" && item.users.toLowerCase() === "guest") return false;
-    }
-    if (platform === "Whitelabel" && instituteId && instituteId !== "" && instituteId !== "All" && item.instituteId !== instituteId) return false;
-    if (userId && !item.userId.toLowerCase().includes(userId.toLowerCase()) && !item.users.toLowerCase().includes(userId.toLowerCase())) return false;
-    return true;
-  }).slice(0, parseInt(recordsPerPage, 10) || 50).map((item) => ({
-    ...item,
-    messages: messagesMap[item.sessionId] || defaultMessages,
-  }));
+  const displayLabel = selectedValue === "All" || selectedValue.startsWith("All ") || selectedValue === "Date"
+    ? label 
+    : selectedValue;
 
   return (
-    <div className="audit-log-page">
-      <div className="audit-log-header">
-        <h1 className="audit-log-title">Chatbot Audit Logs ({filteredLogs.length})</h1>
+    <div className="custom-dropdown-container" ref={dropdownRef}>
+      <button 
+        type="button" 
+        className={`custom-dropdown-pill ${isOpen ? 'active' : ''}`} 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{displayLabel}</span>
+        <FiChevronDown className={`chevron-icon ${isOpen ? 'rotate' : ''}`} size={14} />
+      </button>
 
-        <div className="header-right-group">
-          <div className="custom-dropdown-container">
-            <button className={`filter-dropdown-trigger limit-trigger ${isRecordsOpen ? "active" : ""}`} onClick={() => { setIsRecordsOpen(!isRecordsOpen); setIsPlatformOpen(false); setIsUserTypeOpen(false); setIsInstituteOpen(false); setIsDateOpen(false); }}>
-              <span>{`${recordsPerPage} Records Per Page`}</span>
-              <FiChevronDown size={14} className="dropdown-arrow" />
-            </button>
-            {isRecordsOpen && (
-              <div className="custom-dropdown-menu">
-                {["10", "50", "100"].map((opt) => (
-                  <div key={opt} className={`dropdown-item ${recordsPerPage === opt ? "selected" : ""}`} onClick={() => { setRecordsPerPage(opt); setIsRecordsOpen(false); }}>
-                    {`${opt} Records Per Page`}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="pagination-arrows">
-            <button className="page-arrow-btn"><FiChevronLeft size={18} /></button>
-            <button className="page-arrow-btn"><FiChevronRight size={18} /></button>
-          </div>
-        </div>
-      </div>
-
-      <div className="filter-header-bar">
-        <div className="filters-group" ref={filterRef}>
-          {/* Platform */}
-          <div className="custom-dropdown-container">
-            <button className={`filter-dropdown-trigger ${isPlatformOpen ? "active" : ""} ${!platform ? "placeholder" : ""}`} onClick={() => { setIsPlatformOpen(!isPlatformOpen); setIsUserTypeOpen(false); setIsLimitOpen(false); setIsDateOpen(false); }}>
-              <span>{platform === "" ? "Platform Type" : platform}</span>
-              {platform !== "" && <FiX size={14} className="clear-icon" onClick={(e) => { e.stopPropagation(); setPlatform(""); }} />}
-              <FiChevronDown size={14} className="dropdown-arrow" />
-            </button>
-            {isPlatformOpen && (
-              <div className="custom-dropdown-menu">
-                {["All Platform", "Marketplace", "Whitelabel"].map((opt) => (
-                  <div key={opt} className={`dropdown-item ${platform === opt ? "selected" : ""}`} onClick={() => { setPlatform(opt); setIsPlatformOpen(false); }}>
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* User type */}
-          <div className="custom-dropdown-container">
-            <button className={`filter-dropdown-trigger ${isUserTypeOpen ? "active" : ""} ${!userType ? "placeholder" : ""}`} onClick={() => { setIsUserTypeOpen(!isUserTypeOpen); setIsPlatformOpen(false); setIsLimitOpen(false); setIsDateOpen(false); }}>
-              <span>{userType === "" ? "User type" : userType}</span>
-              {userType !== "" && <FiX size={14} className="clear-icon" onClick={(e) => { e.stopPropagation(); setUserType(""); }} />}
-              <FiChevronDown size={14} className="dropdown-arrow" />
-            </button>
-            {isUserTypeOpen && (
-              <div className="custom-dropdown-menu">
-                {["All User Type", "Guest", "Users"].map((opt) => (
-                  <div key={opt} className={`dropdown-item ${userType === opt ? "selected" : ""}`} onClick={() => { setUserType(opt); setIsUserTypeOpen(false); }}>
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Institute ID (only for Whitelabel) */}
-          {platform === "Whitelabel" && (
-            <div className="custom-dropdown-container">
-              <button className={`filter-dropdown-trigger ${isInstituteOpen ? "active" : ""} ${!instituteId ? "placeholder" : ""}`} onClick={() => { setIsInstituteOpen(!isInstituteOpen); setIsPlatformOpen(false); setIsUserTypeOpen(false); setIsLimitOpen(false); setIsDateOpen(false); }}>
-                <span>{instituteId || "Institute"}</span>
-                {instituteId && <FiX size={14} className="clear-icon" onClick={(e) => { e.stopPropagation(); setInstituteId(""); }} />}
-                <FiChevronDown size={14} className="dropdown-arrow" />
-              </button>
-              {isInstituteOpen && (
-                <div className="custom-dropdown-menu">
-                  {["All", "Wayvida", "Python Coaching Center", "ROE Institute", "Gayathri Tuition Center"].map((opt) => (
-                    <div key={opt} className={`dropdown-item ${instituteId === opt ? "selected" : ""}`} onClick={() => { setInstituteId(opt); setIsInstituteOpen(false); }}>
-                      {opt}
-                    </div>
-                  ))}
-                </div>
-              )}
+      {isOpen && (
+        <div className="custom-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={`custom-dropdown-item ${selectedValue === opt.value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+            >
+              {opt.label}
             </div>
-          )}
-
-          {/* User ID */}
-          <div className="input-with-clear">
-            <input
-              type="text"
-              className="filter-input user-search-input"
-              placeholder="Search user with name or userID"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-            {userId && <FiX className="clear-icon" size={14} onClick={() => setUserId("")} />}
-          </div>
-
-          {/* Date */}
-          <div className="custom-dropdown-container">
-            <button className={`filter-dropdown-trigger ${isDateOpen ? "active" : ""}`} onClick={() => { setIsDateOpen(!isDateOpen); setIsPlatformOpen(false); setIsUserTypeOpen(false); setIsLimitOpen(false); setShowDualCal(false); }}>
-              <span>{dateLabel}</span>
-              {dateLabel !== "Date" && <FiX size={14} className="clear-icon" onClick={(e) => { e.stopPropagation(); setDateLabel("Date"); setStartDate(""); setEndDate(""); }} />}
-              <FiChevronDown size={14} className="dropdown-arrow" />
-            </button>
-            {isDateOpen && (
-              <div className="date-popover-menu">
-                <div className="presets-list">
-                  {presets.map((preset) => (
-                    <div key={preset} className="preset-item" onClick={() => { setDateLabel(preset); setIsDateOpen(false); }}>
-                      {preset}
-                    </div>
-                  ))}
-                </div>
-                <div className="custom-range-trigger-wrapper">
-                  <div className="custom-range-trigger" onClick={(e) => { e.stopPropagation(); setShowDualCal(!showDualCal); }}>
-                    <span>{startDate || "Start date"}</span>
-                    <span className="arrow-sep">&rarr;</span>
-                    <span>{endDate || "End date"}</span>
-                  </div>
-                  {showDualCal && (
-                    <DualMonthCalendar
-                      onSelectRange={(start, end) => {
-                        setStartDate(start);
-                        setEndDate(end);
-                        setDateLabel("Custom Range");
-                        setShowDualCal(false);
-                        setIsDateOpen(false);
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <button className="clear-btn" onClick={handleClearAll}>Clear</button>
+          ))}
         </div>
-      </div>
-
-      <div className="audit-table-container">
-        <table className="audit-table">
-          <thead>
-            <tr>
-              <th>Users</th>
-              <th>Datetime</th>
-              <th>Platform Type</th>
-              <th>Institute</th>
-              <th>Device</th>
-              <th>Page/Screen</th>
-              <th>Final Intent</th>
-              <th>Total Chats</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLogs.length === 0 ? (
-              <tr>
-                <td colSpan={8} style={{ textAlign: "center", color: "#8c8c8c" }}>No audit logs found matching the selected filters.</td>
-              </tr>
-            ) : (
-              filteredLogs.map((row, idx) => (
-                <tr key={idx} onClick={() => setSelectedSessionIndex(idx)} style={{ cursor: "pointer" }}>
-                  <td><strong>{row.users}</strong></td>
-                  <td>{row.datetime}</td>
-                  <td><span className={`platform-pill ${row.platformType.toLowerCase()}`}>{row.platformType}</span></td>
-                  <td>{row.platformType === "Marketplace" ? "Wayvida" : row.instituteId}</td>
-                  <td>{row.device || "Desktop"}</td>
-                  <td>{row.pageScreen}</td>
-                  <td><span className="intent-badge">{row.intent}</span></td>
-                  <td>{row.totalChats || row.messages.length}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {selectedSessionIndex !== null && filteredLogs[selectedSessionIndex] && (
-        <SessionDetailModal
-          sessionData={filteredLogs[selectedSessionIndex]}
-          selectedIndex={selectedSessionIndex}
-          totalSessions={filteredLogs.length}
-          onPrevSession={() => setSelectedSessionIndex((i) => Math.max(0, i - 1))}
-          onNextSession={() => setSelectedSessionIndex((i) => Math.min(filteredLogs.length - 1, i + 1))}
-          onClose={() => setSelectedSessionIndex(null)}
-        />
       )}
     </div>
   );
 }
 
+export default function ChatbotAuditLog() {
+  const [sessions] = useState(auditLogData);
+  const [selectedSessionId, setSelectedSessionId] = useState(auditLogData[0]?.sessionId);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [platformFilter, setPlatformFilter] = useState("All Platform");
+  const [userTypeFilter, setUserTypeFilter] = useState("All User Type");
+  const [instituteFilter, setInstituteFilter] = useState("All");
+  const [leadScoreFilter, setLeadScoreFilter] = useState("All Lead Score");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFilter, setDateFilter] = useState("Date");
+
+  const filteredLogs = sessions.filter((item) => {
+    if (platformFilter && platformFilter !== "All" && platformFilter !== "All Platform" && item.platformType !== platformFilter) return false;
+    if (userTypeFilter && userTypeFilter !== "All" && userTypeFilter !== "All User Type") {
+      if (userTypeFilter === "Guest" && item.users.toLowerCase() !== "guest") return false;
+      if (userTypeFilter === "Named" && item.users.toLowerCase() === "guest") return false;
+    }
+    if (instituteFilter && instituteFilter !== "All" && instituteFilter !== "Institute: All" && item.instituteId !== instituteFilter) return false;
+    if (leadScoreFilter && leadScoreFilter !== "All" && leadScoreFilter !== "All Lead Score") {
+      const score = item.leadScore || 75;
+      if (leadScoreFilter === "High" && score < 75) return false;
+      if (leadScoreFilter === "Medium" && (score < 45 || score >= 75)) return false;
+      if (leadScoreFilter === "Low" && score >= 45) return false;
+    }
+    if (searchTerm && !item.userId.toLowerCase().includes(searchTerm.toLowerCase()) && !item.users.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  });
+
+  const activeSession = filteredLogs.find(s => s.sessionId === selectedSessionId) || filteredLogs[0] || auditLogData[0];
+  const activeMessages = activeSession?.messages || messagesMap[activeSession?.sessionId] || [];
+
+  const [openToken, setOpenToken] = useState(null);
+  const [copiedField, setCopiedField] = useState(null);
+  const handleCopy = (value, field) => {
+    navigator.clipboard.writeText(value);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  function renderText(text) {
+    if (!text) return null;
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((p, i) => {
+      if (p.startsWith("**") && p.endsWith("**")) return <strong key={i}>{p.slice(2, -2)}</strong>;
+      return <span key={i}>{p}</span>;
+    });
+  }
+
+  return (
+    <div className="audit-log-page">
+      <div className="page-header-section">
+        <h2 className="audit-log-title">
+          Chatbot Audit Logs ({filteredLogs.length})
+        </h2>
+      </div>
+
+      {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
+      <div className="audit-filter-bar">
+        <CustomDropdownPill
+          label="All Platform"
+          selectedValue={platformFilter}
+          onChange={setPlatformFilter}
+          options={[
+            { label: "All Platform", value: "All Platform" },
+            { label: "Whitelabel", value: "Whitelabel" },
+            { label: "Marketplace", value: "Marketplace" }
+          ]}
+        />
+
+        <CustomDropdownPill
+          label="All User Type"
+          selectedValue={userTypeFilter}
+          onChange={setUserTypeFilter}
+          options={[
+            { label: "All User Type", value: "All User Type" },
+            { label: "Named User", value: "Named" },
+            { label: "Guest", value: "Guest" }
+          ]}
+        />
+
+        <CustomDropdownPill
+          label="Institute: All"
+          selectedValue={instituteFilter}
+          onChange={setInstituteFilter}
+          options={[
+            { label: "Institute: All", value: "All" },
+            { label: "Python Coaching Center", value: "Python Coaching Center" },
+            { label: "Tech Academy", value: "Tech Academy" }
+          ]}
+        />
+
+        <CustomDropdownPill
+          label="All Lead Score"
+          selectedValue={leadScoreFilter}
+          onChange={setLeadScoreFilter}
+          options={[
+            { label: "All Lead Score", value: "All Lead Score" },
+            { label: "High (75 - 100)", value: "High" },
+            { label: "Medium (45 - 74)", value: "Medium" },
+            { label: "Low (0 - 44)", value: "Low" }
+          ]}
+        />
+
+        <CustomDropdownPill
+          label="Date"
+          selectedValue={dateFilter}
+          onChange={setDateFilter}
+          options={[
+            { label: "Date", value: "Date" },
+            { label: "Today", value: "Today" },
+            { label: "Yesterday", value: "Yesterday" },
+            { label: "Last 7 Days", value: "Last 7 Days" }
+          ]}
+        />
+
+        <button 
+          onClick={() => { 
+            setPlatformFilter("All Platform"); 
+            setUserTypeFilter("All User Type"); 
+            setInstituteFilter("All"); 
+            setLeadScoreFilter("All Lead Score"); 
+            setSearchTerm(""); 
+            setDateFilter("Date"); 
+          }} 
+          className="audit-filter-btn"
+        >
+          Clear
+        </button>
+      </div>
+
+      {/* 3-PANE WHATSAPP CRM LAYOUT */}
+      <div className="whatsapp-crm-container">
+        {/* Pane 1: Session List */}
+        <div className="pane-session-list">
+          {/* WhatsApp style Search Bar */}
+          <div className="session-list-search-container">
+            <div className="whatsapp-search-input-box">
+              <FiSearch className="whatsapp-search-icon" size={16} />
+              <input
+                type="text"
+                placeholder="Search User"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="whatsapp-search-input"
+              />
+              {searchTerm && (
+                <button type="button" className="whatsapp-search-clear-btn" onClick={() => setSearchTerm("")}>✕</button>
+              )}
+            </div>
+          </div>
+
+          <div className="session-list-scroll">
+            {filteredLogs.map((session) => {
+              const avatar = getUserAvatar(session.users);
+              const isSelected = session.sessionId === activeSession?.sessionId;
+              const sessionMsgs = session.messages || messagesMap[session.sessionId] || [];
+              return (
+                <div
+                  key={session.sessionId}
+                  className={`session-card-item ${isSelected ? "active" : ""}`}
+                  onClick={() => setSelectedSessionId(session.sessionId)}
+                >
+                  {avatar ? (
+                    <img src={avatar} alt={session.users} className="user-avatar-photo" />
+                  ) : (
+                    <div className="avatar-circle">G</div>
+                  )}
+                  <div className="session-item-info">
+                    <div className="session-item-top">
+                      <span className="session-user-name">{session.users === "guest" ? "guest (public)" : session.users}</span>
+                      <span className="session-time-txt">{session.datetime.split(",")[1]?.trim().slice(0, 8) || ""}</span>
+                    </div>
+                    <div className="session-intent-snippet" title={getLastMessageText(session)}>
+                      {getLastMessageText(session)}
+                    </div>
+                  </div>
+                  <span className="msg-count-pill">{sessionMsgs.length}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Pane 2: Chat Window & Floating AI Summary */}
+        <div className="pane-chat-window">
+          {/* Chat Header */}
+          <div className="chat-pane-header">
+            <div className="chat-header-user-clickable" onClick={() => setIsSidebarOpen(!isSidebarOpen)} title="Click to view Contact Details">
+              {getUserAvatar(activeSession?.users) ? (
+                <img src={getUserAvatar(activeSession?.users)} alt={activeSession?.users} className="user-avatar-photo" style={{ width: 36, height: 36 }} />
+              ) : (
+                <div className="avatar-circle" style={{ width: 36, height: 36, fontSize: 14 }}>G</div>
+              )}
+              <div className="chat-header-details-column">
+                <div className="chat-header-title">{activeSession?.users === "guest" ? "guest (public)" : activeSession?.users}</div>
+                <div className="chat-header-sub-badges">
+                  <span className="badge-pill badge-whitelabel">{activeSession?.platformType}</span>
+                  <span className="badge-pill badge-institute">{activeSession?.platformType === "Marketplace" ? "Wayvida" : activeSession?.instituteId}</span>
+                  <span className="badge-pill badge-device">{activeSession?.device}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="chat-pane-header-right">
+              <span className="lead-score-badge" style={{ backgroundColor: "#ecfdf5", color: "#047857", border: "1px solid #a7f3d0", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", fontSize: "12px" }}>
+                Lead Score: {activeSession?.leadScore ?? 50}
+              </span>
+            </div>
+          </div>
+
+          {/* Chat Messages Body */}
+          <div className="chat-pane-messages">
+            {activeMessages.map((msg) => (
+              msg.role === "user" ? (
+                <div key={msg.id} className="chat-row user-row">
+                  <div className="user-bubble">
+                    <div className="user-text">{renderText(msg.text)}</div>
+                    <div className="user-meta">{msg.timestamp} ✓</div>
+                  </div>
+                  <div className="msg-intent-under">intent: <span className="intent-highlight">{msg.intent}</span></div>
+                </div>
+              ) : (
+                <div key={msg.id} className="chat-row assistant-row">
+                  <div className="assistant-avatar">
+                    <img src={chatbotAvatar} alt="Chatbot Avatar" className="chatbot-avatar-img" />
+                  </div>
+                  <div className="assistant-content">
+                    <div className="assistant-bubble">
+                      <div className="assistant-text">{renderText(msg.text)}</div>
+                    </div>
+                    <div className="assistant-meta">{msg.timestamp} • {msg.latency}</div>
+                    {msg.options && (
+                      <div className="quick-replies">
+                        {msg.options.map((q) => {
+                          const optionText = typeof q === "string" ? q : q.label;
+                          const isLink = /view|open|app|play|browse|http|url/i.test(optionText);
+                          return (
+                            <button key={optionText} className="quick-reply">
+                              {isLink ? <FiExternalLink size={12} /> : <FiMessageSquare size={12} />}
+                              <span>{optionText}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {msg.tokens && (
+                      <div>
+                        <button className="token-usage-btn" onClick={() => setOpenToken(openToken === msg.id ? null : msg.id)}>
+                          Token usage {openToken === msg.id ? "▲" : "▼"}
+                        </button>
+                        {openToken === msg.id && (
+                          <div className="token-details">Prompt: {msg.tokens.prompt} • Completion: {msg.tokens.completion} • Total: {msg.tokens.total}</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
+
+          {/* Floating AI Banner (Hidden when Sidebar Pane 3 is Open) */}
+          {!isSidebarOpen && (
+            <div className="ai-sales-intelligence-banner">
+              <div className="ai-banner-header">
+                <div className="ai-banner-title">
+                  <svg className="w-4 h-4 text-blue-500 inline" fill="currentColor" viewBox="0 0 20 20" style={{ width: '16px', height: '16px', color: '#3b82f6' }}>
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span>AI Sales Intelligence &amp; Next Best Action</span>
+                </div>
+                {(() => {
+                  const score = activeSession?.leadScore ?? 50;
+                  let badgeText = activeSession?.opportunityTag || "Potential Lead";
+                  let badgeStyle = { bg: "#ecfdf5", text: "#047857", border: "#a7f3d0" };
+                  if (score < 45) { badgeStyle = { bg: "#f1f5f9", text: "#475569", border: "#cbd5e1" }; }
+                  else if (score < 75) { badgeStyle = { bg: "#fffbeb", text: "#b45309", border: "#fde68a" }; }
+                  return (
+                    <span className="ai-opportunity-badge" style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text, borderColor: badgeStyle.border }}>
+                      {activeSession?.opportunityTag || badgeText}
+                    </span>
+                  );
+                })()}
+              </div>
+              <div className="ai-banner-grid">
+                <div className="ai-banner-col">
+                  <div className="ai-col-label">Final Intent &amp; Dropoff</div>
+                  <div className="ai-col-value">{activeSession?.finalIntent || activeSession?.intent || "General Inquiry"}</div>
+                </div>
+                <div className="ai-banner-col">
+                  <div className="ai-col-label">Lead Qualification</div>
+                  <div className="ai-col-value">
+                    <span style={{ color: (activeSession?.leadScore ?? 50) >= 75 ? "#16a34a" : (activeSession?.leadScore ?? 50) >= 45 ? "#d97706" : "#64748b", fontWeight: "700" }}>{activeSession?.leadScore ?? 50} / 100</span>
+                    <span style={{ color: "#64748b", fontWeight: "400" }}> • {(activeSession?.leadScore ?? 50) >= 75 ? "High Buying Intent" : (activeSession?.leadScore ?? 50) >= 45 ? "Moderate Intent" : "Low Intent"}</span>
+                  </div>
+                </div>
+                <div className="ai-banner-col">
+                  <div className="ai-col-label">Recommended Pitch for Sales</div>
+                  <div className="ai-col-value">{activeSession?.recommendedPitch || "Follow up with standard info pack"}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Pane 3: Contact Details Sidebar */}
+        {isSidebarOpen && (
+          <div className="pane-contact-sidebar">
+            <div className="sidebar-header-bar">
+              <span>Contact & Session Details</span>
+              <button className="session-close-btn" onClick={() => setIsSidebarOpen(false)}>✕</button>
+            </div>
+            <div className="sidebar-body-content">
+              <div className="profile-card-center">
+                {getUserAvatar(activeSession?.users) ? (
+                  <img src={getUserAvatar(activeSession?.users)} alt={activeSession?.users} className="user-avatar-photo" style={{ width: 60, height: 60 }} />
+                ) : (
+                  <div className="avatar-circle" style={{ width: 60, height: 60, fontSize: 22 }}>G</div>
+                )}
+                <div className="profile-name">{activeSession?.users === "guest" ? "guest (public)" : activeSession?.users}</div>
+                <span className="platform-badge">{activeSession?.platformType}</span>
+              </div>
+              <div className="meta-details-list">
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">User ID</span>
+                  <span className="meta-detail-val">{activeSession?.userId}</span>
+                  <button className="copy-btn" onClick={() => handleCopy(activeSession?.userId, "uid")}>
+                    {copiedField === "uid" ? <FiCheck size={12} /> : <FiCopy size={12} />}
+                  </button>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Institute</span>
+                  <span className="meta-detail-val">{activeSession?.platformType === "Marketplace" ? "Wayvida" : activeSession?.instituteId}</span>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Page/Screen</span>
+                  <span className="meta-detail-val">{activeSession?.pageScreen}</span>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Device</span>
+                  <span className="meta-detail-val">{activeSession?.device}</span>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Created At</span>
+                  <span className="meta-detail-val">{activeSession?.datetime}</span>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Avg Latency</span>
+                  <span className="meta-detail-val">2m 14s</span>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Total Tokens</span>
+                  <span className="meta-detail-val">{activeSession?.totalTokens || "1,240"}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
