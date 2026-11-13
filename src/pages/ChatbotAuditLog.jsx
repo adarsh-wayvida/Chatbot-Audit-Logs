@@ -94,6 +94,136 @@ function CustomDropdownPill({ label, options, selectedValue, onChange, customFoo
   );
 }
 
+// Dual-Month Calendar Picker Component matching Image specs
+function DualMonthCalendarPicker({ onSelectRange, onClose }) {
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 10, 1)); // Nov 2026 as per image
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [hoverDate, setHoverDate] = useState(null);
+
+  const prevYear = () => setCurrentDate(new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), 1));
+  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  const nextYear = () => setCurrentDate(new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), 1));
+
+  const month1 = currentDate;
+  const month2 = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const formatMonthTitle = (d) => `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+
+  const getDaysArray = (year, monthIndex) => {
+    const firstDayIndex = new Date(year, monthIndex, 1).getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const prevMonthDays = new Date(year, monthIndex, 0).getDate();
+
+    const days = [];
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const d = prevMonthDays - i;
+      const prevDate = new Date(year, monthIndex - 1, d);
+      days.push({ day: d, dateStr: prevDate.toISOString().split("T")[0], isOtherMonth: true });
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const mStr = String(monthIndex + 1).padStart(2, "0");
+      const dStr = String(d).padStart(2, "0");
+      days.push({ day: d, dateStr: `${year}-${mStr}-${dStr}`, isOtherMonth: false });
+    }
+    const totalSlots = 42;
+    const remainingSlots = totalSlots - days.length;
+    for (let d = 1; d <= remainingSlots; d++) {
+      const nextDate = new Date(year, monthIndex + 1, d);
+      days.push({ day: d, dateStr: nextDate.toISOString().split("T")[0], isOtherMonth: true });
+    }
+    return days;
+  };
+
+  const handleDayClick = (dateStr) => {
+    if (!startDate || (startDate && endDate)) {
+      setStartDate(dateStr);
+      setEndDate(null);
+    } else if (startDate && !endDate) {
+      if (dateStr < startDate) {
+        setStartDate(dateStr);
+        setEndDate(null);
+      } else {
+        setEndDate(dateStr);
+        const sParts = startDate.split("-");
+        const eParts = dateStr.split("-");
+        const sMonth = monthNames[parseInt(sParts[1], 10) - 1];
+        const eMonth = monthNames[parseInt(eParts[1], 10) - 1];
+        const rangeText = `${parseInt(sParts[2], 10)} ${sMonth} - ${parseInt(eParts[2], 10)} ${eMonth}`;
+        onSelectRange(rangeText, startDate, dateStr);
+        if (onClose) onClose();
+      }
+    }
+  };
+
+  const renderMonthGrid = (year, monthIndex) => {
+    const days = getDaysArray(year, monthIndex);
+    return (
+      <div className="calendar-month-column">
+        <div className="calendar-week-header">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+            <span key={day} className="week-day-title">{day}</span>
+          ))}
+        </div>
+        <div className="calendar-days-grid">
+          {days.map((item, idx) => {
+            const isStart = item.dateStr === startDate;
+            const isEnd = item.dateStr === endDate;
+            const effectiveEnd = endDate || hoverDate;
+            const isInRange = startDate && effectiveEnd && item.dateStr > startDate && item.dateStr < effectiveEnd;
+            const isSelected = isStart || isEnd;
+            const isTodayCircle = item.dateStr === "2026-11-13" && !startDate;
+
+            let cellClass = "calendar-day-cell";
+            if (item.isOtherMonth) cellClass += " other-month";
+            if (isSelected) cellClass += " selected-day";
+            else if (isInRange && !item.isOtherMonth) cellClass += " in-range";
+            else if (isTodayCircle && !item.isOtherMonth) cellClass += " today-circle";
+
+            return (
+              <div
+                key={idx}
+                className={cellClass}
+                onClick={() => handleDayClick(item.dateStr)}
+                onMouseEnter={() => { if (startDate && !endDate) setHoverDate(item.dateStr); }}
+              >
+                {item.day}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="dual-month-calendar-popup" onClick={(e) => e.stopPropagation()}>
+      <div className="calendar-arrow-tip" />
+      <div className="calendar-top-header">
+        <div className="header-nav-group left-nav">
+          <button type="button" className="nav-arrow-btn" onClick={prevYear} title="Previous Year">«</button>
+          <button type="button" className="nav-arrow-btn" onClick={prevMonth} title="Previous Month">‹</button>
+        </div>
+        <div className="header-month-titles">
+          <span className="month-title">{formatMonthTitle(month1)}</span>
+          <span className="month-title">{formatMonthTitle(month2)}</span>
+        </div>
+        <div className="header-nav-group right-nav">
+          <button type="button" className="nav-arrow-btn" onClick={nextMonth} title="Next Month">›</button>
+          <button type="button" className="nav-arrow-btn" onClick={nextYear} title="Next Year">»</button>
+        </div>
+      </div>
+
+      <div className="dual-calendar-grids-wrapper">
+        {renderMonthGrid(month1.getFullYear(), month1.getMonth())}
+        {renderMonthGrid(month2.getFullYear(), month2.getMonth())}
+      </div>
+    </div>
+  );
+}
+
 export default function ChatbotAuditLog() {
   const [sessions] = useState(auditLogData);
   const [selectedSessionId, setSelectedSessionId] = useState(auditLogData[0]?.sessionId);
@@ -105,6 +235,9 @@ export default function ChatbotAuditLog() {
   const [leadScoreFilter, setLeadScoreFilter] = useState("All Lead Score");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("Date");
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [customRangeStart, setCustomRangeStart] = useState("");
+  const [customRangeEnd, setCustomRangeEnd] = useState("");
 
   const filteredLogs = sessions.filter((item) => {
     if (platformFilter && platformFilter !== "All" && platformFilter !== "All Platform" && item.platformType !== platformFilter) return false;
@@ -201,7 +334,10 @@ export default function ChatbotAuditLog() {
         <CustomDropdownPill
           label="Date"
           selectedValue={dateFilter}
-          onChange={setDateFilter}
+          onChange={(val) => {
+            setDateFilter(val);
+            setShowCalendar(false);
+          }}
           options={[
             { label: "Today", value: "Today" },
             { label: "Yesterday", value: "Yesterday" },
@@ -213,23 +349,39 @@ export default function ChatbotAuditLog() {
             { label: "Last Year", value: "Last Year" }
           ]}
           customFooter={(close) => (
-            <div className="date-range-box" onClick={(e) => e.stopPropagation()}>
-              <input
-                type="text"
-                placeholder="Start date"
-                className="date-range-input"
-                onFocus={(e) => (e.target.type = "date")}
-                onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
-              />
-              <span className="date-range-arrow">→</span>
-              <input
-                type="text"
-                placeholder="End date"
-                className="date-range-input"
-                onFocus={(e) => (e.target.type = "date")}
-                onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
-              />
-              <FiCalendar size={14} className="date-range-cal-icon" />
+            <div className="date-range-footer-wrapper">
+              <div
+                className={`date-range-box ${showCalendar ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowCalendar(!showCalendar);
+                }}
+              >
+                <span className={`date-range-label ${!customRangeStart ? 'placeholder' : ''}`}>
+                  {customRangeStart || "Start date"}
+                </span>
+                <span className="date-range-arrow">→</span>
+                <span className={`date-range-label ${!customRangeEnd ? 'placeholder' : ''}`}>
+                  {customRangeEnd || "End date"}
+                </span>
+                <FiCalendar size={14} className="date-range-cal-icon" />
+              </div>
+
+              {showCalendar && (
+                <DualMonthCalendarPicker
+                  onSelectRange={(rangeText, start, end) => {
+                    setCustomRangeStart(start);
+                    setCustomRangeEnd(end);
+                    setDateFilter(rangeText);
+                    setShowCalendar(false);
+                    close();
+                  }}
+                  onClose={() => {
+                    setShowCalendar(false);
+                    close();
+                  }}
+                />
+              )}
             </div>
           )}
         />
@@ -441,6 +593,15 @@ export default function ChatbotAuditLog() {
                 <span className="platform-badge">{activeSession?.platformType}</span>
               </div>
               <div className="meta-details-list">
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Session ID</span>
+                  <span className="meta-detail-val" title={activeSession?.sessionId}>
+                    {activeSession?.sessionId}
+                  </span>
+                  <button className="copy-btn" onClick={() => handleCopy(activeSession?.sessionId, "sid")}>
+                    {copiedField === "sid" ? <FiCheck size={12} /> : <FiCopy size={12} />}
+                  </button>
+                </div>
                 <div className="meta-detail-row">
                   <span className="meta-detail-label">User ID</span>
                   <span className="meta-detail-val">{activeSession?.userId}</span>

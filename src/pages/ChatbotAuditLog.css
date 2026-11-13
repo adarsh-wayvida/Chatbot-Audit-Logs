@@ -76,7 +76,8 @@
 }
 
 /* Custom Dropdown Date Range Picker Footer */
-.custom-dropdown-footer {
+.date-range-footer-wrapper {
+  position: relative;
   margin-top: 6px;
   padding-top: 6px;
   border-top: 1px solid #f1f5f9;
@@ -85,31 +86,28 @@
 .date-range-box {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   background: #ffffff;
+  cursor: pointer;
   transition: all 0.15s ease-in-out;
 }
 
-.date-range-box:focus-within,
-.date-range-box:hover {
+.date-range-box:hover,
+.date-range-box.active {
   border-color: #009be6;
   box-shadow: 0 0 0 2px rgba(0, 155, 230, 0.12);
 }
 
-.date-range-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 12px;
-  color: #334155;
-  width: 72px;
+.date-range-label {
+  font-size: 12.5px;
+  color: #1e293b;
   font-weight: 500;
 }
 
-.date-range-input::placeholder {
+.date-range-label.placeholder {
   color: #94a3b8;
   font-weight: 400;
 }
@@ -123,6 +121,151 @@
   color: #94a3b8;
   margin-left: auto;
   flex-shrink: 0;
+}
+
+/* Dual-Month Calendar Popup (Floating directly above input box) */
+.dual-month-calendar-popup {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  padding: 16px 20px;
+  z-index: 300;
+  width: 480px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.calendar-arrow-tip {
+  position: absolute;
+  bottom: -6px;
+  left: 28px;
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  transform: rotate(45deg);
+}
+
+.calendar-top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.header-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-arrow-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.12s ease;
+}
+
+.nav-arrow-btn:hover {
+  color: #009be6;
+  background: #f0f9ff;
+}
+
+.header-month-titles {
+  display: flex;
+  gap: 135px;
+  justify-content: center;
+  align-items: center;
+}
+
+.month-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.dual-calendar-grids-wrapper {
+  display: flex;
+  gap: 24px;
+}
+
+.calendar-month-column {
+  flex: 1;
+}
+
+.calendar-week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.week-day-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px 0;
+  text-align: center;
+}
+
+.calendar-day-cell {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  color: #334155;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.12s ease;
+}
+
+.calendar-day-cell:hover {
+  background: #f0f9ff;
+  color: #009be6;
+}
+
+.calendar-day-cell.other-month {
+  color: #cbd5e1;
+}
+
+.calendar-day-cell.today-circle {
+  border: 1.5px solid #009be6;
+  color: #009be6;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 28px;
+  margin: 0 auto;
+}
+
+.calendar-day-cell.selected-day {
+  background: #009be6 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 28px;
+  margin: 0 auto;
+}
+
+.calendar-day-cell.in-range {
+  background: #e0f2fe !important;
+  color: #0369a1 !weight;
+  border-radius: 0 !important;
 }
 
 @keyframes fadeIn {
@@ -654,10 +797,21 @@
   justify-content: space-between;
   align-items: center;
   font-size: 12.5px;
+  gap: 8px;
 }
 
-.meta-detail-label { color: #64748b; }
-.meta-detail-val { font-weight: 600; color: #0f172a; }
+.meta-detail-label { 
+  color: #64748b; 
+  flex-shrink: 0;
+}
+
+.meta-detail-val { 
+  font-weight: 600; 
+  color: #0f172a; 
+  font-size: 12.5px;
+  text-align: right;
+  word-break: break-all;
+}
 
 .copy-btn {
   background: none;
