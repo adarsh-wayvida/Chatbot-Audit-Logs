@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone } from "react-icons/fi";
+import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
 import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
@@ -40,7 +40,7 @@ const getDeviceIcon = (device) => {
 };
 
 // Custom Dropdown Pill Component (Matches Image 1 style perfectly)
-function CustomDropdownPill({ label, options, selectedValue, onChange }) {
+function CustomDropdownPill({ label, options, selectedValue, onChange, customFooter }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -83,6 +83,11 @@ function CustomDropdownPill({ label, options, selectedValue, onChange }) {
               {opt.label}
             </div>
           ))}
+          {customFooter && (
+            <div className="custom-dropdown-footer">
+              {customFooter(() => setIsOpen(false))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -198,11 +203,35 @@ export default function ChatbotAuditLog() {
           selectedValue={dateFilter}
           onChange={setDateFilter}
           options={[
-            { label: "Date", value: "Date" },
             { label: "Today", value: "Today" },
             { label: "Yesterday", value: "Yesterday" },
-            { label: "Last 7 Days", value: "Last 7 Days" }
+            { label: "This Week", value: "This Week" },
+            { label: "Last Week", value: "Last Week" },
+            { label: "This Month", value: "This Month" },
+            { label: "Last Month", value: "Last Month" },
+            { label: "This Year", value: "This Year" },
+            { label: "Last Year", value: "Last Year" }
           ]}
+          customFooter={(close) => (
+            <div className="date-range-box" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="text"
+                placeholder="Start date"
+                className="date-range-input"
+                onFocus={(e) => (e.target.type = "date")}
+                onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+              />
+              <span className="date-range-arrow">→</span>
+              <input
+                type="text"
+                placeholder="End date"
+                className="date-range-input"
+                onFocus={(e) => (e.target.type = "date")}
+                onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+              />
+              <FiCalendar size={14} className="date-range-cal-icon" />
+            </div>
+          )}
         />
 
         <button 
