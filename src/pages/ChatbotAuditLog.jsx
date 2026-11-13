@@ -74,12 +74,13 @@ function CustomDropdownPill({ label, options, selectedValue, onChange, customFoo
       <button 
         type="button" 
         className={`custom-dropdown-pill ${isOpen ? 'active' : ''}`} 
+        title={displayLabel}
         onClick={() => {
           setIsOpen(!isOpen);
           if (onToggle) onToggle(!isOpen);
         }}
       >
-        <span>{displayLabel}</span>
+        <span className="dropdown-pill-text">{displayLabel}</span>
         <FiChevronDown className={`chevron-icon ${isOpen ? 'rotate' : ''}`} size={14} />
       </button>
 
@@ -259,8 +260,10 @@ export default function ChatbotAuditLog() {
 
   const [sessionStatuses, setSessionStatuses] = useState(() => {
     const map = {};
-    auditLogData.forEach(s => {
-      map[s.sessionId] = s.auditStatus || "Unreviewed";
+    // Pre-populate mock status for 19 sessions (mix of Pushed and Not Pushed)
+    auditLogData.forEach((s, idx) => {
+      // Alternate or assign specific mock values so 10 are Pushed and 9 are Not Pushed
+      map[s.sessionId] = (idx % 2 === 0) ? "Pushed" : "Not Pushed";
     });
     return map;
   });
@@ -303,9 +306,11 @@ export default function ChatbotAuditLog() {
     }
     if (searchTerm && !item.userId.toLowerCase().includes(searchTerm.toLowerCase()) && !item.users.toLowerCase().includes(searchTerm.toLowerCase())) return false;
 
-    // Feature 1: Status filter
+    // CRM Push Status filter
     if (statusFilter && statusFilter !== "All") {
-      if (sessionStatuses[item.sessionId] !== statusFilter) return false;
+      const isPushed = sessionStatuses[item.sessionId] === "Pushed";
+      if (statusFilter === "Pushed" && !isPushed) return false;
+      if (statusFilter === "Not Pushed" && isPushed) return false;
     }
 
     // Feature 2: Bot Stuck filter
@@ -385,17 +390,15 @@ export default function ChatbotAuditLog() {
           ]}
         />
 
-        {/* 3. Session Audit Status Filter */}
+        {/* 3. CRM Push Status Filter */}
         <CustomDropdownPill
-          label="All Status"
-          selectedValue={statusFilter}
+          label="All CRM Status"
+          selectedValue={statusFilter === "All" ? "All CRM Status" : statusFilter}
           onChange={setStatusFilter}
           options={[
-            { label: "All Status", value: "All" },
-            { label: "Unreviewed", value: "Unreviewed" },
-            { label: "Reviewed", value: "Reviewed" },
-            { label: "Followed Up", value: "Followed Up" },
-            { label: "Ignored", value: "Ignored" }
+            { label: "All CRM Status", value: "All" },
+            { label: "Pushed to CRM", value: "Pushed" },
+            { label: "Not Pushed", value: "Not Pushed" }
           ]}
         />
 
@@ -414,13 +417,13 @@ export default function ChatbotAuditLog() {
 
         {/* 5. AI Bot Responses / Stuck Filter */}
         <CustomDropdownPill
-          label="All Bot Responses"
-          selectedValue={stuckFilter === "All" ? "All Bot Responses" : stuckFilter}
+          label="All Responses"
+          selectedValue={stuckFilter === "All" ? "All Responses" : stuckFilter === "Unanswered" ? "AI Stuck" : stuckFilter === "Slow" ? "AI Delays" : stuckFilter}
           onChange={(val) => setStuckFilter(val)}
           options={[
-            { label: "All Bot Responses", value: "All" },
-            { label: "AI Couldn't Answer", value: "Unanswered" },
-            { label: "Slow / Delayed AI", value: "Slow" }
+            { label: "All Responses", value: "All" },
+            { label: "AI Stuck", value: "Unanswered" },
+            { label: "AI Delays", value: "Slow" }
           ]}
         />
 
@@ -756,25 +759,18 @@ export default function ChatbotAuditLog() {
               </div>
 
               <div className="sidebar-section-card">
-                <div className="sidebar-section-title">AUDIT ACTION</div>
-                <div className="meta-detail-row status-action-row">
-                  <span className="meta-detail-label">Current Status</span>
-                  <div className="status-selector-wrapper">
-                    <select
-                      className={`status-badge-pill ${(sessionStatuses[activeSession?.sessionId] || "Unreviewed").toLowerCase().replace(/\s+/g, "-")}`}
-                      value={sessionStatuses[activeSession?.sessionId] || "Unreviewed"}
-                      onChange={(e) => {
-                        const newStatus = e.target.value;
-                        setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: newStatus }));
-                      }}
-                    >
-                      <option value="Unreviewed" className="opt-unreviewed">• Unreviewed</option>
-                      <option value="Reviewed" className="opt-reviewed">✓ Reviewed</option>
-                      <option value="Followed Up" className="opt-followed">✓ Followed Up</option>
-                      <option value="Ignored" className="opt-ignored">✕ Ignored</option>
-                    </select>
-                  </div>
-                </div>
+                <div className="sidebar-section-title">CRM INTEGRATION</div>
+                <button
+                  className={`push-crm-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed disabled" : ""}`}
+                  disabled={sessionStatuses[activeSession?.sessionId] === "Pushed"}
+                  onClick={() => {
+                    if (sessionStatuses[activeSession?.sessionId] !== "Pushed") {
+                      setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: "Pushed" }));
+                    }
+                  }}
+                >
+                  {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
+                </button>
               </div>
 
               <div className="sidebar-section-card">

@@ -10,24 +10,52 @@
   justify-content: space-between !important;
   gap: 8px !important;
   height: 38px !important;
-  padding: 0 14px !important;
-  border: 1px solid #009be6 !important; /* Elegant blue border matching Image 1 */
-  border-radius: 12px !important; /* Soft rounded pill shape */
+  width: 155px !important;
+  padding: 0 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
   background-color: #ffffff !important;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-  color: #1e3a8a !important; /* Deep soft blue text */
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  letter-spacing: 0.1px !important;
+  color: #455560 !important;
   cursor: pointer !important;
   outline: none !important;
-  box-shadow: 0 2px 6px rgba(0, 155, 230, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   transition: all 0.15s ease-in-out !important;
+  box-sizing: border-border-box !important;
 }
 
-.custom-dropdown-pill:hover,
-.custom-dropdown-pill.active {
-  border-color: #0284c7 !important;
+.dropdown-pill-text {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  flex: 1 !important;
+  text-align: left !important;
+}
+
+.chevron-icon {
+  flex-shrink: 0 !important;
+  color: #0284c7 !important;
+  transition: transform 0.2s ease !important;
+}
+
+.custom-dropdown-pill:hover {
+  border-color: #cbd5e1 !important;
+  background-color: #f8fafc !important;
+  color: #455560 !important;
+}
+
+.custom-dropdown-pill.active,
+.custom-dropdown-pill.selected-active {
+  border-color: #045C99 !important;
   background-color: #f0f9ff !important;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+  color: #045C99 !important;
+  font-weight: 600 !important;
+  line-height: 21px !important;
+  letter-spacing: 0.1px !important;
 }
 
 .chevron-icon {
@@ -60,24 +88,27 @@
 }
 
 .custom-dropdown-item {
-  padding: 10px 14px;
-  font-size: 13px;
-  color: #334155;
-  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: #455560;
+  font-weight: 400;
+  line-height: 21px;
+  letter-spacing: 0.1px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
   transition: all 0.12s ease;
 }
 
 .custom-dropdown-item:hover {
   background: #f0f9ff;
-  color: #0284c7;
+  color: #045C99;
 }
 
 .custom-dropdown-item.selected {
-  background: #e0f2fe;
-  color: #0369a1;
-  font-weight: 700;
+  background: #f0f9ff;
+  color: #045C99;
+  font-weight: 600;
 }
 
 /* Custom Dropdown Date Range Picker Footer */
@@ -346,17 +377,26 @@
 }
 
 .audit-filter-btn {
+  height: 38px !important;
   padding: 0 16px !important;
   cursor: pointer !important;
-  font-weight: 600 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
   background-color: #ffffff !important;
-  color: #64748b !important;
-  border-color: #e2e8f0 !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  letter-spacing: 0.1px !important;
+  color: #455560 !important;
+  outline: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.15s ease-in-out !important;
 }
 
 .audit-filter-btn:hover {
   background-color: #f8fafc !important;
-  color: #0f172a !important;
+  color: #455560 !important;
   border-color: #cbd5e1 !important;
 }
 
@@ -1141,3 +1181,41 @@
 .status-badge-pill option.opt-reviewed { color: #1d4ed8; }
 .status-badge-pill option.opt-followed { color: #15803d; }
 .status-badge-pill option.opt-ignored { color: #b91c1c; }
+
+
+/* Push Lead to CRM Button in Pane 3 */
+.push-crm-btn {
+  width: 100%;
+  height: 42px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  transition: all 0.15s ease-in-out;
+}
+
+.push-crm-btn:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.push-crm-btn.pushed {
+  background-color: #94a3b8;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.75;
+  box-shadow: none;
+}
+
+.push-crm-btn.pushed:hover {
+  background-color: #94a3b8;
+  box-shadow: none;
+}
