@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch } from "react-icons/fi";
+import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
 import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
@@ -29,6 +29,14 @@ const getLastMessageText = (session) => {
   if (msgs.length === 0) return session.intent || "No messages";
   const lastMsg = msgs[msgs.length - 1];
   return lastMsg.text;
+};
+
+const getDeviceIcon = (device) => {
+  const dev = (device || "").toLowerCase();
+  if (dev.includes("android") || dev.includes("iphone") || dev.includes("mobile") || dev.includes("phone")) {
+    return <FiSmartphone size={13} title={device} style={{ display: "block" }} />;
+  }
+  return <FiMonitor size={13} title={device} style={{ display: "block" }} />;
 };
 
 // Custom Dropdown Pill Component (Matches Image 1 style perfectly)
@@ -258,7 +266,6 @@ export default function ChatbotAuditLog() {
                       {getLastMessageText(session)}
                     </div>
                   </div>
-                  <span className="msg-count-pill">{sessionMsgs.length}</span>
                 </div>
               );
             })}
@@ -280,7 +287,7 @@ export default function ChatbotAuditLog() {
                 <div className="chat-header-sub-badges">
                   <span className="badge-pill badge-whitelabel">{activeSession?.platformType}</span>
                   <span className="badge-pill badge-institute">{activeSession?.platformType === "Marketplace" ? "Wayvida" : activeSession?.instituteId}</span>
-                  <span className="badge-pill badge-device">{activeSession?.device}</span>
+                  <span className="badge-pill badge-device" title={activeSession?.device}>{getDeviceIcon(activeSession?.device)}</span>
                 </div>
               </div>
             </div>
@@ -427,6 +434,10 @@ export default function ChatbotAuditLog() {
                 <div className="meta-detail-row">
                   <span className="meta-detail-label">Created At</span>
                   <span className="meta-detail-val">{activeSession?.datetime}</span>
+                </div>
+                <div className="meta-detail-row">
+                  <span className="meta-detail-label">Total Messages</span>
+                  <span className="meta-detail-val">{activeMessages.length}</span>
                 </div>
                 <div className="meta-detail-row">
                   <span className="meta-detail-label">Avg Latency</span>
