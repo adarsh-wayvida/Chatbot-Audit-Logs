@@ -39,10 +39,21 @@ const getDeviceIcon = (device) => {
   return <FiMonitor size={13} title={device} style={{ display: "block" }} />;
 };
 
+const getLeadScoreStyle = (score = 50) => {
+  if (score >= 75) return { bg: "#ecfdf5", text: "#047857", border: "#a7f3d0" };
+  if (score >= 45) return { bg: "#fffbeb", text: "#b45309", border: "#fde68a" };
+  return { bg: "#f1f5f9", text: "#475569", border: "#cbd5e1" };
+};
+
 // Custom Dropdown Pill Component (Matches Image 1 style perfectly)
-function CustomDropdownPill({ label, options, selectedValue, onChange, customFooter }) {
+function CustomDropdownPill({ label, options, selectedValue, onChange, customFooter, onToggle, enableSearch }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchText] = useState("");
   const dropdownRef = useRef(null);
+
+  const filteredOptions = enableSearch && searchTerm
+    ? options.filter(opt => opt.label.toLowerCase().includes(searchTerm.toLowerCase()))
+    : options;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -63,7 +74,10 @@ function CustomDropdownPill({ label, options, selectedValue, onChange, customFoo
       <button 
         type="button" 
         className={`custom-dropdown-pill ${isOpen ? 'active' : ''}`} 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (onToggle) onToggle(!isOpen);
+        }}
       >
         <span>{displayLabel}</span>
         <FiChevronDown className={`chevron-icon ${isOpen ? 'rotate' : ''}`} size={14} />
@@ -71,18 +85,33 @@ function CustomDropdownPill({ label, options, selectedValue, onChange, customFoo
 
       {isOpen && (
         <div className="custom-dropdown-menu">
-          {options.map((opt) => (
-            <div
-              key={opt.value}
-              className={`custom-dropdown-item ${selectedValue === opt.value ? 'selected' : ''}`}
-              onClick={() => {
-                onChange(opt.value);
-                setIsOpen(false);
-              }}
-            >
-              {opt.label}
+          {enableSearch && (
+            <div className="dropdown-search-wrapper">
+              <input
+                type="text"
+                className="dropdown-search-input"
+                placeholder="Search institute..."
+                value={searchTerm}
+                onChange={(e) => setSearchText(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
             </div>
-          ))}
+          )}
+          <div className="dropdown-options-scroll">
+            {filteredOptions.map((opt) => (
+              <div
+                key={opt.value}
+                className={`custom-dropdown-item ${selectedValue === opt.value ? 'selected' : ''}`}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                  setSearchText("");
+                }}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>
           {customFooter && (
             <div className="custom-dropdown-footer">
               {customFooter(() => setIsOpen(false))}
@@ -227,10 +256,18 @@ function DualMonthCalendarPicker({ onSelectRange, onClose }) {
 export default function ChatbotAuditLog() {
   const [sessions] = useState(auditLogData);
   const [selectedSessionId, setSelectedSessionId] = useState(auditLogData[0]?.sessionId);
+
+  const [sessionStatuses, setSessionStatuses] = useState(() => {
+    const map = {};
+    auditLogData.forEach(s => {
+      map[s.sessionId] = s.auditStatus || "Unreviewed";
+    });
+    return map;
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [platformFilter, setPlatformFilter] = useState("All Platform");
-  const [userTypeFilter, setUserTypeFilter] = useState("All User Type");
+  const [userTypeFilterTab, setUserTypeFilterTab] = useState("All");
   const [instituteFilter, setInstituteFilter] = useState("All");
   const [leadScoreFilter, setLeadScoreFilter] = useState("All Lead Score");
   const [searchTerm, setSearchTerm] = useState("");
@@ -239,13 +276,25 @@ export default function ChatbotAuditLog() {
   const [customRangeStart, setCustomRangeStart] = useState("");
   const [customRangeEnd, setCustomRangeEnd] = useState("");
 
+  // Feature 1: Session Status tracking
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  // Feature 2: Bot Stuck filter
+  const [stuckFilter, setStuckFilter] = useState("All");
+
+  // Feature 4: Copy Pitch state
+  const [copiedPitch, setCopiedPitch] = useState(false);
+
   const filteredLogs = sessions.filter((item) => {
     if (platformFilter && platformFilter !== "All" && platformFilter !== "All Platform" && item.platformType !== platformFilter) return false;
-    if (userTypeFilter && userTypeFilter !== "All" && userTypeFilter !== "All User Type") {
-      if (userTypeFilter === "Guest" && item.users.toLowerCase() !== "guest") return false;
-      if (userTypeFilter === "Named" && item.users.toLowerCase() === "guest") return false;
+    if (userTypeFilterTab === "Guest" && item.users.toLowerCase() !== "guest") return false;
+    if (userTypeFilterTab === "Registered" && item.users.toLowerCase() === "guest") return false;
+    if (instituteFilter !== "All") {
+      const matchInst = item.instituteId === instituteFilter ||
+        item.institute === instituteFilter ||
+        (instituteFilter === "Wayvida" && (item.instituteId === "Wayvida" || item.platformType === "Marketplace"));
+      if (!matchInst) return false;
     }
-    if (instituteFilter && instituteFilter !== "All" && instituteFilter !== "Institute: All" && item.instituteId !== instituteFilter) return false;
     if (leadScoreFilter && leadScoreFilter !== "All" && leadScoreFilter !== "All Lead Score") {
       const score = item.leadScore || 75;
       if (leadScoreFilter === "High" && score < 75) return false;
@@ -253,6 +302,31 @@ export default function ChatbotAuditLog() {
       if (leadScoreFilter === "Low" && score >= 45) return false;
     }
     if (searchTerm && !item.userId.toLowerCase().includes(searchTerm.toLowerCase()) && !item.users.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+
+    // Feature 1: Status filter
+    if (statusFilter && statusFilter !== "All") {
+      if (sessionStatuses[item.sessionId] !== statusFilter) return false;
+    }
+
+    // Feature 2: Bot Stuck filter
+    if (stuckFilter && stuckFilter !== "All") {
+      const msgs = messagesMap[item.sessionId] || [];
+      if (stuckFilter === "Unanswered") {
+        const hasUnanswered = msgs.some((m) =>
+          m.role === "assistant" &&
+          /didn't understand|sorry|not sure|rephrase|could not/i.test(m.text)
+        );
+        if (!hasUnanswered) return false;
+      } else if (stuckFilter === "Slow") {
+        const hasSlow = msgs.some((m) => {
+          if (m.role !== "assistant" || !m.latency) return false;
+          const num = parseInt(m.latency, 10);
+          return !isNaN(num) && num > 800;
+        });
+        if (!hasSlow) return false;
+      }
+    }
+
     return true;
   });
 
@@ -278,14 +352,13 @@ export default function ChatbotAuditLog() {
 
   return (
     <div className="audit-log-page">
-      <div className="page-header-section">
+      <div className="audit-top-header-row">
         <h2 className="audit-log-title">
           Chatbot Audit Logs ({filteredLogs.length})
         </h2>
-      </div>
 
-      {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
-      <div className="audit-filter-bar">
+        {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
+        <div className="audit-filter-bar">
         <CustomDropdownPill
           label="All Platform"
           selectedValue={platformFilter}
@@ -298,27 +371,35 @@ export default function ChatbotAuditLog() {
         />
 
         <CustomDropdownPill
-          label="All User Type"
-          selectedValue={userTypeFilter}
-          onChange={setUserTypeFilter}
-          options={[
-            { label: "All User Type", value: "All User Type" },
-            { label: "Named User", value: "Named" },
-            { label: "Guest", value: "Guest" }
-          ]}
-        />
-
-        <CustomDropdownPill
-          label="Institute: All"
+          label="All Institute"
           selectedValue={instituteFilter}
           onChange={setInstituteFilter}
+          enableSearch={true}
           options={[
-            { label: "Institute: All", value: "All" },
+            { label: "All Institute", value: "All" },
+            { label: "Wayvida", value: "Wayvida" },
             { label: "Python Coaching Center", value: "Python Coaching Center" },
+            { label: "Gaythri Tuition Center", value: "Gaythri Tuition Center" },
+            { label: "ROE Institute", value: "ROE Institute" },
             { label: "Tech Academy", value: "Tech Academy" }
           ]}
         />
 
+        {/* 3. Session Audit Status Filter */}
+        <CustomDropdownPill
+          label="All Status"
+          selectedValue={statusFilter}
+          onChange={setStatusFilter}
+          options={[
+            { label: "All Status", value: "All" },
+            { label: "Unreviewed", value: "Unreviewed" },
+            { label: "Reviewed", value: "Reviewed" },
+            { label: "Followed Up", value: "Followed Up" },
+            { label: "Ignored", value: "Ignored" }
+          ]}
+        />
+
+        {/* 4. Lead Score Filter */}
         <CustomDropdownPill
           label="All Lead Score"
           selectedValue={leadScoreFilter}
@@ -331,6 +412,19 @@ export default function ChatbotAuditLog() {
           ]}
         />
 
+        {/* 5. AI Bot Responses / Stuck Filter */}
+        <CustomDropdownPill
+          label="All Bot Responses"
+          selectedValue={stuckFilter === "All" ? "All Bot Responses" : stuckFilter}
+          onChange={(val) => setStuckFilter(val)}
+          options={[
+            { label: "All Bot Responses", value: "All" },
+            { label: "AI Couldn't Answer", value: "Unanswered" },
+            { label: "Slow / Delayed AI", value: "Slow" }
+          ]}
+        />
+
+        {/* 6. Date Filter (Positioned at the end of dropdown pills) */}
         <CustomDropdownPill
           label="Date"
           selectedValue={dateFilter}
@@ -338,6 +432,7 @@ export default function ChatbotAuditLog() {
             setDateFilter(val);
             setShowCalendar(false);
           }}
+          onToggle={() => setShowCalendar(false)}
           options={[
             { label: "Today", value: "Today" },
             { label: "Yesterday", value: "Yesterday" },
@@ -386,20 +481,24 @@ export default function ChatbotAuditLog() {
           )}
         />
 
-        <button 
+        {/* 7. Clear Button */}
+        <button
           onClick={() => { 
             setPlatformFilter("All Platform"); 
-            setUserTypeFilter("All User Type"); 
+            setUserTypeFilterTab("All"); 
             setInstituteFilter("All"); 
             setLeadScoreFilter("All Lead Score"); 
             setSearchTerm(""); 
-            setDateFilter("Date"); 
+            setDateFilter("Date");
+            setStatusFilter("All Status");
+            setStuckFilter("All");
           }} 
           className="audit-filter-btn"
         >
           Clear
         </button>
       </div>
+    </div>
 
       {/* 3-PANE WHATSAPP CRM LAYOUT */}
       <div className="whatsapp-crm-container">
@@ -419,6 +518,30 @@ export default function ChatbotAuditLog() {
               {searchTerm && (
                 <button type="button" className="whatsapp-search-clear-btn" onClick={() => setSearchTerm("")}>✕</button>
               )}
+            </div>
+
+            <div className="whatsapp-filter-tabs">
+              <button
+                type="button"
+                className={`whatsapp-tab-pill ${userTypeFilterTab === 'All' ? 'active' : ''}`}
+                onClick={() => setUserTypeFilterTab('All')}
+              >
+                All ({sessions.length})
+              </button>
+              <button
+                type="button"
+                className={`whatsapp-tab-pill ${userTypeFilterTab === 'Guest' ? 'active' : ''}`}
+                onClick={() => setUserTypeFilterTab('Guest')}
+              >
+                Guests ({sessions.filter(s => s.users.toLowerCase() === 'guest').length})
+              </button>
+              <button
+                type="button"
+                className={`whatsapp-tab-pill ${userTypeFilterTab === 'Registered' ? 'active' : ''}`}
+                onClick={() => setUserTypeFilterTab('Registered')}
+              >
+                Registered ({sessions.filter(s => s.users.toLowerCase() !== 'guest').length})
+              </button>
             </div>
           </div>
 
@@ -445,6 +568,29 @@ export default function ChatbotAuditLog() {
                     </div>
                     <div className="session-intent-snippet" title={getLastMessageText(session)}>
                       {getLastMessageText(session)}
+                    </div>
+                    <div className="session-card-badges">
+                      {(() => {
+                        const score = session.leadScore ?? 50;
+                        const style = getLeadScoreStyle(score);
+                        return (
+                          <span
+                            className="card-lead-score-pill"
+                            style={{
+                              backgroundColor: style.bg,
+                              color: style.text,
+                              border: `1px solid ${style.border}`
+                            }}
+                          >
+                            Lead Score: {score}
+                          </span>
+                        );
+                      })()}
+                      <span className="card-intent-pill" title={session.intent}>
+                        {session.intent === "explore_course" || session.intent === "PSC Exam Bundles & Pricing"
+                          ? "Course Query"
+                          : session.finalIntent || session.intent || "General Inquiry"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -497,34 +643,48 @@ export default function ChatbotAuditLog() {
                     <img src={chatbotAvatar} alt="Chatbot Avatar" className="chatbot-avatar-img" />
                   </div>
                   <div className="assistant-content">
-                    <div className="assistant-bubble">
+                    <div className="assistant-card-box">
                       <div className="assistant-text">{renderText(msg.text)}</div>
+                      {msg.options && msg.options.length > 0 && (
+                        <>
+                          <div className="assistant-card-divider" />
+                          <div className="quick-replies-group">
+                            {msg.options.map((q) => {
+                              const optionText = typeof q === "string" ? q : q.label;
+                              const isLink = /view|open|app|play|browse|http|url|compare|buy/i.test(optionText);
+
+                              return (
+                                <button key={optionText} className="quick-reply-pill">
+                                  {isLink ? (
+                                    <FiExternalLink size={13} style={{ marginRight: "6px", flexShrink: 0 }} />
+                                  ) : (
+                                    <FiMessageSquare size={13} style={{ marginRight: "6px", flexShrink: 0 }} />
+                                  )}
+                                  <span>{optionText}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <div className="assistant-meta">{msg.timestamp} • {msg.latency}</div>
-                    {msg.options && (
-                      <div className="quick-replies">
-                        {msg.options.map((q) => {
-                          const optionText = typeof q === "string" ? q : q.label;
-                          const isLink = /view|open|app|play|browse|http|url/i.test(optionText);
-                          return (
-                            <button key={optionText} className="quick-reply">
-                              {isLink ? <FiExternalLink size={12} /> : <FiMessageSquare size={12} />}
-                              <span>{optionText}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                    {msg.tokens && (
-                      <div>
-                        <button className="token-usage-btn" onClick={() => setOpenToken(openToken === msg.id ? null : msg.id)}>
-                          Token usage {openToken === msg.id ? "▲" : "▼"}
-                        </button>
-                        {openToken === msg.id && (
-                          <div className="token-details">Prompt: {msg.tokens.prompt} • Completion: {msg.tokens.completion} • Total: {msg.tokens.total}</div>
-                        )}
-                      </div>
-                    )}
+
+                    <div className="assistant-meta-footer">
+                      <span className="meta-time">{msg.timestamp}</span>
+                      <span className="meta-dot">•</span>
+                      {msg.latency && (
+                        <span
+                          className={`latency-badge-pill ${parseInt(msg.latency) > 800 ? 'latency-warning' : ''}`}
+                        >
+                          {parseInt(msg.latency) > 800 ? '⚠️' : '⚡'} {msg.latency}
+                        </span>
+                      )}
+                      {msg.tokens && (
+                        <span className="tokens-badge-pill">
+                          🪙 {msg.tokens.total || msg.tokens} tokens
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
@@ -568,7 +728,9 @@ export default function ChatbotAuditLog() {
                 </div>
                 <div className="ai-banner-col">
                   <div className="ai-col-label">Recommended Pitch for Sales</div>
-                  <div className="ai-col-value">{activeSession?.recommendedPitch || "Follow up with standard info pack"}</div>
+                  <div className="ai-col-value">
+                    {activeSession?.recommendedPitch || "Follow up with standard info pack"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -585,57 +747,85 @@ export default function ChatbotAuditLog() {
             <div className="sidebar-body-content">
               <div className="profile-card-center">
                 {getUserAvatar(activeSession?.users) ? (
-                  <img src={getUserAvatar(activeSession?.users)} alt={activeSession?.users} className="user-avatar-photo" style={{ width: 60, height: 60 }} />
+                  <img src={getUserAvatar(activeSession?.users)} alt={activeSession?.users} className="user-avatar-photo" style={{ width: 56, height: 56, borderRadius: "50%" }} />
                 ) : (
-                  <div className="avatar-circle" style={{ width: 60, height: 60, fontSize: 22 }}>G</div>
+                  <div className="avatar-circle" style={{ width: 56, height: 56, fontSize: 20 }}>G</div>
                 )}
-                <div className="profile-name">{activeSession?.users === "guest" ? "guest (public)" : activeSession?.users}</div>
+                <div className="profile-name">{activeSession?.users === "guest" ? "Guest (Public)" : activeSession?.users}</div>
                 <span className="platform-badge">{activeSession?.platformType}</span>
               </div>
-              <div className="meta-details-list">
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Session ID</span>
-                  <span className="meta-detail-val" title={activeSession?.sessionId}>
-                    {activeSession?.sessionId}
-                  </span>
-                  <button className="copy-btn" onClick={() => handleCopy(activeSession?.sessionId, "sid")}>
-                    {copiedField === "sid" ? <FiCheck size={12} /> : <FiCopy size={12} />}
-                  </button>
+
+              <div className="sidebar-section-card">
+                <div className="sidebar-section-title">AUDIT ACTION</div>
+                <div className="meta-detail-row status-action-row">
+                  <span className="meta-detail-label">Current Status</span>
+                  <div className="status-selector-wrapper">
+                    <select
+                      className={`status-badge-pill ${(sessionStatuses[activeSession?.sessionId] || "Unreviewed").toLowerCase().replace(/\s+/g, "-")}`}
+                      value={sessionStatuses[activeSession?.sessionId] || "Unreviewed"}
+                      onChange={(e) => {
+                        const newStatus = e.target.value;
+                        setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: newStatus }));
+                      }}
+                    >
+                      <option value="Unreviewed" className="opt-unreviewed">• Unreviewed</option>
+                      <option value="Reviewed" className="opt-reviewed">✓ Reviewed</option>
+                      <option value="Followed Up" className="opt-followed">✓ Followed Up</option>
+                      <option value="Ignored" className="opt-ignored">✕ Ignored</option>
+                    </select>
+                  </div>
                 </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">User ID</span>
-                  <span className="meta-detail-val">{activeSession?.userId}</span>
-                  <button className="copy-btn" onClick={() => handleCopy(activeSession?.userId, "uid")}>
-                    {copiedField === "uid" ? <FiCheck size={12} /> : <FiCopy size={12} />}
-                  </button>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Institute</span>
-                  <span className="meta-detail-val">{activeSession?.platformType === "Marketplace" ? "Wayvida" : activeSession?.instituteId}</span>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Page/Screen</span>
-                  <span className="meta-detail-val">{activeSession?.pageScreen}</span>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Device</span>
-                  <span className="meta-detail-val">{activeSession?.device}</span>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Created At</span>
-                  <span className="meta-detail-val">{activeSession?.datetime}</span>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Total Messages</span>
-                  <span className="meta-detail-val">{activeMessages.length}</span>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Avg Latency</span>
-                  <span className="meta-detail-val">2m 14s</span>
-                </div>
-                <div className="meta-detail-row">
-                  <span className="meta-detail-label">Total Tokens</span>
-                  <span className="meta-detail-val">{activeSession?.totalTokens || "1,240"}</span>
+              </div>
+
+              <div className="sidebar-section-card">
+                <div className="sidebar-section-title">SESSION DETAILS</div>
+                <div className="meta-details-list">
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Session ID</span>
+                    <div className="val-with-copy">
+                      <span className="meta-detail-val truncate-id" title={activeSession?.sessionId}>
+                        {activeSession?.sessionId ? `${activeSession.sessionId.substring(0, 12)}...` : ""}
+                      </span>
+                      <button className="copy-btn" onClick={() => handleCopy(activeSession?.sessionId, "sid")}>
+                        {copiedField === "sid" ? <FiCheck size={12} /> : <FiCopy size={12} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">User ID</span>
+                    <div className="val-with-copy">
+                      <span className="meta-detail-val truncate-id" title={activeSession?.userId}>
+                        {activeSession?.userId ? `${activeSession.userId.substring(0, 12)}...` : ""}
+                      </span>
+                      <button className="copy-btn" onClick={() => handleCopy(activeSession?.userId, "uid")}>
+                        {copiedField === "uid" ? <FiCheck size={12} /> : <FiCopy size={12} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Institute</span>
+                    <span className="meta-detail-val">{activeSession?.platformType === "Marketplace" ? "Wayvida" : activeSession?.instituteId}</span>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Page/Screen</span>
+                    <span className="meta-detail-val">{activeSession?.pageScreen}</span>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Device</span>
+                    <span className="meta-detail-val">{activeSession?.device}</span>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Created At</span>
+                    <span className="meta-detail-val">{activeSession?.datetime}</span>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Total Messages</span>
+                    <span className="meta-detail-val">{activeMessages.length}</span>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Total Tokens</span>
+                    <span className="meta-detail-val">{activeSession?.totalTokens || "1,240"}</span>
+                  </div>
                 </div>
               </div>
             </div>

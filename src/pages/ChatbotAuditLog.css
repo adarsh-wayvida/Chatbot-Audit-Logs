@@ -54,6 +54,11 @@
   animation: fadeIn 0.15s ease-out;
 }
 
+.custom-dropdown-container:last-of-type .custom-dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
 .custom-dropdown-item {
   padding: 10px 14px;
   font-size: 13px;
@@ -127,7 +132,8 @@
 .dual-month-calendar-popup {
   position: absolute;
   bottom: calc(100% + 12px);
-  left: 0;
+  right: 0;
+  left: auto;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -141,7 +147,8 @@
 .calendar-arrow-tip {
   position: absolute;
   bottom: -6px;
-  left: 28px;
+  right: 28px;
+  left: auto;
   width: 10px;
   height: 10px;
   background: #ffffff;
@@ -284,9 +291,14 @@
   overflow: hidden;
 }
 
-.page-header-section {
-  background: transparent;
-  padding: 0 0 16px 0;
+.audit-top-header-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 28px !important;
+  margin-bottom: 18px !important;
+  width: 100% !important;
+  flex-wrap: wrap !important;
 }
 
 .audit-log-title {
@@ -298,15 +310,15 @@
   letter-spacing: 0.2px;
   margin: 0;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .audit-filter-bar {
   display: flex !important;
   flex-wrap: wrap !important;
   align-items: center !important;
-  gap: 12px !important;
-  margin-bottom: 20px !important;
-  width: 100% !important;
+  gap: 10px !important;
+  margin-bottom: 0 !important;
 }
 
 .audit-filter-input,
@@ -452,6 +464,72 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.sidebar-section-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.val-with-copy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.truncate-id {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-badge-pill {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.status-badge-pill.unreviewed {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.status-badge-pill.reviewed {
+  background-color: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.status-badge-pill.followed-up {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.status-badge-pill.ignored {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
 }
 
 .avatar-circle {
@@ -613,41 +691,93 @@
 .assistant-avatar { width: 32px; height: 32px; flex-shrink: 0; }
 .chatbot-avatar-img { width: 100%; height: 100%; border-radius: 50%; }
 
-.assistant-content { max-width: 75%; }
-.assistant-bubble {
+.assistant-content { max-width: 520px; }
+.assistant-card-box {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  padding: 10px 14px;
-  border-radius: 14px 14px 14px 2px;
-  font-size: 13px;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.assistant-text {
+  font-size: 14px;
   color: #1e293b;
+  line-height: 1.5;
 }
 
-.assistant-meta {
-  font-size: 10px;
-  color: #94a3b8;
-  margin-top: 4px;
+.assistant-card-divider {
+  border-top: 1px solid #f1f5f9;
+  margin: 12px 0 10px 0;
 }
 
-.quick-replies {
+.quick-replies-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 8px;
 }
 
-.quick-reply {
-  display: flex;
+.quick-reply-pill {
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #ffffff;
-  border: 1px solid #009be6;
-  color: #009be6;
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 11.5px;
-  font-weight: 600;
+  background-color: #f0f7ff;
+  border: 1px solid #d0e1fd;
+  color: #1d4ed8;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-reply-pill:hover {
+  background-color: #e0edff;
+  border-color: #b8d5fc;
+}
+
+.assistant-meta-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.meta-time {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.meta-dot {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.latency-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e6f4ea;
+  color: #137333;
+  border: 1px solid #ceead6;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 600;
+  font-size: 11.5px;
+}
+
+.tokens-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 500;
+  font-size: 11.5px;
 }
 
 .token-usage-btn {
@@ -820,3 +950,194 @@
   color: #0284c7;
   margin-left: 4px;
 }
+
+/* Session Card Badges - Lead Score & Intent Pills */
+.session-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card-lead-score-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.card-intent-pill {
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 1;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+/* WhatsApp-style filter tabs under Pane 1 search bar */
+.whatsapp-filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.whatsapp-tab-pill {
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.whatsapp-tab-pill:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.whatsapp-tab-pill.active {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 700;
+}
+
+/* Feature 1 & 2: Header Filter Pills */
+/* Feature 3: Latency Warning Badge (> 800ms) */
+.latency-warning {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* Feature 4: Copy Recommended Pitch Button */
+.pitch-copy-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.copy-pitch-btn {
+  background: #009be6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.copy-pitch-btn:hover {
+  background: #0284c7;
+}
+
+/* Dropdown Search Bar - In-menu search for institute filter */
+.dropdown-search-wrapper {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdown-search-input {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 12.5px;
+  outline: none;
+}
+
+.dropdown-options-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+
+/* Container Wrapper for Status Selector in Pane 3 */
+.status-selector-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Status Select Badge Base Pill */
+.status-badge-pill {
+  height: 32px;
+  padding: 0 28px 0 14px;
+  border-radius: 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #334155;
+  transition: all 0.15s ease-in-out;
+  
+  /* Custom dropdown arrow styling */
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Color Themes based on Status */
+.status-badge-pill.unreviewed {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.status-badge-pill.reviewed {
+  background-color: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.status-badge-pill.followed-up {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.status-badge-pill.ignored {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* Dropdown Menu Options Styling */
+.status-badge-pill option {
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 500;
+  padding: 8px;
+}
+
+.status-badge-pill option.opt-unreviewed { color: #475569; }
+.status-badge-pill option.opt-reviewed { color: #1d4ed8; }
+.status-badge-pill option.opt-followed { color: #15803d; }
+.status-badge-pill option.opt-ignored { color: #b91c1c; }

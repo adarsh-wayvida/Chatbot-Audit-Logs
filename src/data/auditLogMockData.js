@@ -39,7 +39,7 @@ export const messagesMap = {
   ],
   "56a9aa20-2b9-deea88a8-38d0-438d-ad7a": [
     { id: 1, role: "user", timestamp: "10 Nov 2026, 12:23:41 pm", text: "join as educator", intent: "creator", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "10 Nov 2026, 12:23:45 pm", latency: "800 ms", text: "Enterprise plan is best for serious teaching business.", options: ["Open plans"], tokens: { prompt: 480, completion: 210, total: 690 } }
+    { id: 2, role: "assistant", timestamp: "10 Nov 2026, 12:23:45 pm", latency: "1420 ms", text: "Enterprise plan is best for serious teaching business with custom domain integration.", options: ["Open plans"], tokens: { prompt: 480, completion: 210, total: 690 } }
   ],
   "9b12211f-70f-1396489d-9aca-4a19-acb7": [
     { id: 1, role: "user", timestamp: "6 Nov 2026, 12:43:43 pm", text: "api access", intent: "api", page: "Course Listing Page" },
@@ -54,12 +54,12 @@ export const messagesMap = {
     { id: 2, role: "assistant", timestamp: "4 Nov 2026, 5:45:03 pm", latency: "150 ms", text: "You can update email and notifications in settings.", options: ["Open settings"], tokens: { prompt: 95, completion: 45, total: 140 } }
   ],
   "43842334-051-35962f1b-2a17-49fe-9f7b": [
-    { id: 1, role: "user", timestamp: "2 Nov 2026, 11:42:30 am", text: "custom app setup", intent: "requirements", page: "Requirements Page" },
-    { id: 2, role: "assistant", timestamp: "2 Nov 2026, 11:42:35 am", latency: "500 ms", text: "Gathering requirements for your custom app.", options: ["Continue"], tokens: { prompt: 300, completion: 150, total: 450 } }
+    { id: 1, role: "user", timestamp: "2 Nov 2026, 11:42:30 am", text: "Can I integrate custom webhook triggers for student enrollment?", intent: "greeting", page: "Requirements Page" },
+    { id: 2, role: "assistant", timestamp: "2 Nov 2026, 11:42:35 am", latency: "1150 ms", text: "Gathering integration docs... Yes, Webhooks are supported on Whitelabel plans.", options: ["View Webhook API"], tokens: { prompt: 350, completion: 120, total: 470 } }
   ],
   "107b843d-414-2f146aa1-a260-4514-8cbe": [
-    { id: 1, role: "user", timestamp: "31 Oct 2026, 6:05:20 pm", text: "course duration?", intent: "explore_course", page: "Course Details Page" },
-    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 6:05:21 pm", latency: "180 ms", text: "This course runs 12 weeks with free trial.", options: ["Enroll"], tokens: { prompt: 100, completion: 50, total: 150 } }
+    { id: 1, role: "user", timestamp: "31 Oct 2026, 6:05:20 pm", text: "Can I pay using Crypto or Forex?", intent: "explore_course", page: "Course Details Page" },
+    { id: 2, role: "assistant", timestamp: "31 Oct 2026, 6:05:21 pm", latency: "180 ms", text: "I'm sorry, I didn't understand that query. Could you please rephrase or choose from the options below?", options: ["View Payment Methods", "Talk to Advisor"], tokens: { prompt: 120, completion: 45, total: 165 } }
   ],
   "12003d85-365-c36b982c-6f6a-4033-9885": [
     { id: 1, role: "user", timestamp: "31 Oct 2026, 6:01:45 pm", text: "certificate?", intent: "greeting", page: "Course Details Page" },
@@ -94,8 +94,8 @@ export const messagesMap = {
     { id: 2, role: "assistant", timestamp: "27 Oct 2026, 4:47:53 pm", latency: "130 ms", text: "Covers Python Basics, Django, and Data Science.", options: ["Download Syllabus"], tokens: { prompt: 95, completion: 40, total: 135 } }
   ],
   "11e786ea-19e-6b080ac4-a386-4a56-b013": [
-    { id: 1, role: "user", timestamp: "27 Oct 2026, 3:54:11 pm", text: "contact support", intent: "ambiguous", page: "Home Page" },
-    { id: 2, role: "assistant", timestamp: "27 Oct 2026, 3:54:12 pm", latency: "80 ms", text: "You can reach support via email at support@wayvida.com.", options: ["Send email"], tokens: { prompt: 65, completion: 25, total: 90 } }
+    { id: 1, role: "user", timestamp: "27 Oct 2026, 3:54:11 pm", text: "Is there offline classroom coaching near Calicut?", intent: "ambiguous", page: "Home Page" },
+    { id: 2, role: "assistant", timestamp: "27 Oct 2026, 3:54:12 pm", latency: "210 ms", text: "I'm not sure about that specific location. I can help with online courses and digital bundles.", options: ["Browse Online Courses"], tokens: { prompt: 110, completion: 38, total: 148 } }
   ],
   "f051bfcf-de6-98a34a0a-94f5-48e0-9f23": [
     { id: 1, role: "user", timestamp: "27 Oct 2026, 2:35:01 pm", text: "hello", intent: "greeting", page: "Home Page" },
