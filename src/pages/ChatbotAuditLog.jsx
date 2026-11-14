@@ -659,22 +659,26 @@ export default function ChatbotAuditLog() {
             </div>
 
             <div className="chat-pane-header-right">
-              <span className="lead-score-badge" style={{ backgroundColor: "#ecfdf5", color: "#047857", border: "1px solid #a7f3d0", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", fontSize: "12px", marginRight: "10px" }}>
-                Lead Score: {activeSession?.leadScore ?? 50}
-              </span>
+              {!isSidebarOpen && (
+                <>
+                  <span className="lead-score-badge" style={{ backgroundColor: "#ecfdf5", color: "#047857", border: "1px solid #a7f3d0", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", fontSize: "12px", marginRight: "10px" }}>
+                    Lead Score: {activeSession?.leadScore ?? 50}
+                  </span>
 
-              {/* Push Lead to CRM Button in Chat Header */}
-              <button
-                className={`push-crm-header-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed disabled" : ""}`}
-                disabled={sessionStatuses[activeSession?.sessionId] === "Pushed"}
-                onClick={() => {
-                  if (sessionStatuses[activeSession?.sessionId] !== "Pushed") {
-                    setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: "Pushed" }));
-                  }
-                }}
-              >
-                {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
-              </button>
+                  {/* Push Lead to CRM Button in Chat Header */}
+                  <button
+                    className={`push-crm-header-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed disabled" : ""}`}
+                    disabled={sessionStatuses[activeSession?.sessionId] === "Pushed"}
+                    onClick={() => {
+                      if (sessionStatuses[activeSession?.sessionId] !== "Pushed") {
+                        setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: "Pushed" }));
+                      }
+                    }}
+                  >
+                    {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
+                  </button>
+                </>
+              )}
 
               {/* 3-Dots Export Menu */}
               <div className="export-menu-container" ref={exportMenuRef}>
@@ -838,6 +842,24 @@ export default function ChatbotAuditLog() {
                 )}
                 <div className="profile-name">{activeSession?.users === "guest" ? "Guest (Public)" : activeSession?.users}</div>
                 <span className="platform-badge">{activeSession?.platformType}</span>
+              </div>
+
+              <div className="sidebar-section-card">
+                <div className="sidebar-section-title">LEAD DETAILS</div>
+                <div className="meta-details-list">
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">Lead Score</span>
+                    <span className="meta-detail-val" style={{ fontWeight: "700", color: (activeSession?.leadScore ?? 50) >= 75 ? "#047857" : (activeSession?.leadScore ?? 50) >= 45 ? "#b45309" : "#475569" }}>
+                      {activeSession?.leadScore ?? 50} / 100
+                    </span>
+                  </div>
+                  <div className="meta-detail-row">
+                    <span className="meta-detail-label">CRM Status</span>
+                    <span className="meta-detail-val" style={{ fontWeight: "600", color: sessionStatuses[activeSession?.sessionId] === "Pushed" ? "#16a34a" : "#64748b" }}>
+                      {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Pushed to CRM" : "Not Pushed"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="sidebar-section-card">
