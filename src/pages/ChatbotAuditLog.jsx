@@ -536,23 +536,6 @@ export default function ChatbotAuditLog() {
             </div>
           )}
         />
-
-        {/* 7. Clear Button */}
-        <button
-          onClick={() => { 
-            setPlatformFilter("All Platform"); 
-            setUserTypeFilterTab("All"); 
-            setInstituteFilter("All"); 
-            setLeadScoreFilter("All Lead Score"); 
-            setSearchTerm(""); 
-            setDateFilter("Date");
-            setStatusFilter("All Status");
-            setStuckFilter("All");
-          }} 
-          className="audit-filter-btn"
-        >
-          Clear
-        </button>
       </div>
     </div>
 
