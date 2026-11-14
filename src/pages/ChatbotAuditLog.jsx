@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar } from "react-icons/fi";
+import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
 import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
@@ -284,6 +284,59 @@ export default function ChatbotAuditLog() {
 
   // Feature 2: Bot Stuck filter
   const [stuckFilter, setStuckFilter] = useState("All");
+
+  // Export Menu Dropdown State
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportMenuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setShowExportMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleExportCSV = (session, messages) => {
+    if (!session) return;
+    const headers = ["Session ID", "User", "Role", "Timestamp", "Message Text", "Intent"];
+    const msgs = messages || [];
+    const rows = msgs.map(m => [
+      `"${session.sessionId}"`,
+      `"${session.users}"`,
+      `"${m.role}"`,
+      `"${m.timestamp}"`,
+      `"${(m.text || "").replace(/"/g, '""')}"`,
+      `"${m.intent || ""}"`
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `chat_export_${session.sessionId.substring(0, 8)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowExportMenu(false);
+  };
+
+  const handleExportJSON = (session, messages) => {
+    if (!session) return;
+    const exportData = {
+      sessionDetails: session,
+      messages: messages || []
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", dataStr);
+    link.setAttribute("download", `chat_export_${session.sessionId.substring(0, 8)}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowExportMenu(false);
+  };
 
   // Feature 4: Copy Pitch state
   const [copiedPitch, setCopiedPitch] = useState(false);
@@ -623,9 +676,55 @@ export default function ChatbotAuditLog() {
             </div>
 
             <div className="chat-pane-header-right">
-              <span className="lead-score-badge" style={{ backgroundColor: "#ecfdf5", color: "#047857", border: "1px solid #a7f3d0", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", fontSize: "12px" }}>
+              <span className="lead-score-badge" style={{ backgroundColor: "#ecfdf5", color: "#047857", border: "1px solid #a7f3d0", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", fontSize: "12px", marginRight: "10px" }}>
                 Lead Score: {activeSession?.leadScore ?? 50}
               </span>
+
+              {/* Push Lead to CRM Button in Chat Header */}
+              <button
+                className={`push-crm-header-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed disabled" : ""}`}
+                disabled={sessionStatuses[activeSession?.sessionId] === "Pushed"}
+                onClick={() => {
+                  if (sessionStatuses[activeSession?.sessionId] !== "Pushed") {
+                    setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: "Pushed" }));
+                  }
+                }}
+              >
+                {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
+              </button>
+
+              {/* 3-Dots Export Menu */}
+              <div className="export-menu-container" ref={exportMenuRef}>
+                <button
+                  type="button"
+                  className={`export-menu-dots-btn ${showExportMenu ? "active" : ""}`}
+                  title="More Options"
+                  onClick={() => setShowExportMenu(!showExportMenu)}
+                >
+                  <FiMoreVertical size={18} />
+                </button>
+
+                {showExportMenu && (
+                  <div className="export-dropdown-menu">
+                    <button
+                      type="button"
+                      className="export-dropdown-item"
+                      onClick={() => handleExportCSV(activeSession, activeMessages)}
+                    >
+                      <FiDownload size={14} style={{ marginRight: "8px" }} />
+                      Export to CSV
+                    </button>
+                    <button
+                      type="button"
+                      className="export-dropdown-item"
+                      onClick={() => handleExportJSON(activeSession, activeMessages)}
+                    >
+                      <FiDownload size={14} style={{ marginRight: "8px" }} />
+                      Export to JSON
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -756,21 +855,6 @@ export default function ChatbotAuditLog() {
                 )}
                 <div className="profile-name">{activeSession?.users === "guest" ? "Guest (Public)" : activeSession?.users}</div>
                 <span className="platform-badge">{activeSession?.platformType}</span>
-              </div>
-
-              <div className="sidebar-section-card">
-                <div className="sidebar-section-title">CRM INTEGRATION</div>
-                <button
-                  className={`push-crm-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed disabled" : ""}`}
-                  disabled={sessionStatuses[activeSession?.sessionId] === "Pushed"}
-                  onClick={() => {
-                    if (sessionStatuses[activeSession?.sessionId] !== "Pushed") {
-                      setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: "Pushed" }));
-                    }
-                  }}
-                >
-                  {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
-                </button>
               </div>
 
               <div className="sidebar-section-card">
