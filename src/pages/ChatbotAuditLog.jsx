@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload } from "react-icons/fi";
+import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload, FiGrid, FiList } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
 import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
@@ -279,8 +279,8 @@ export default function ChatbotAuditLog() {
   const [customRangeStart, setCustomRangeStart] = useState("");
   const [customRangeEnd, setCustomRangeEnd] = useState("");
 
-  // Feature 1: Session Status tracking
-  const [statusFilter, setStatusFilter] = useState("All");
+  // View mode toggle state ('split' = 3-pane WhatsApp view, 'list' = Table / List view)
+  const [viewMode, setViewMode] = useState("split");
 
   // Feature 2: Bot Stuck filter
   const [stuckFilter, setStuckFilter] = useState("All");
@@ -411,12 +411,13 @@ export default function ChatbotAuditLog() {
   return (
     <div className="audit-log-page">
       <div className="audit-top-header-row">
-        <h2 className="audit-log-title">
-          Chatbot Audit Logs ({filteredLogs.length})
-        </h2>
+        <div className="audit-header-left-group">
+          <h2 className="audit-log-title">
+            Chatbot Audit Logs ({filteredLogs.length})
+          </h2>
 
-        {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
-        <div className="audit-filter-bar">
+          {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
+          <div className="audit-filter-bar">
         <CustomDropdownPill
           label="All Platform"
           selectedValue={platformFilter}
@@ -536,6 +537,29 @@ export default function ChatbotAuditLog() {
             </div>
           )}
         />
+        </div>
+      </div>
+
+      {/* VIEW MODE TOGGLE BUTTONS (Segmented Control at Extreme Right) */}
+      <div className="view-mode-toggle-group">
+        <button
+          type="button"
+          className={`view-toggle-btn ${viewMode === "split" ? "active" : ""}`}
+          onClick={() => setViewMode("split")}
+          title="Split Chat View (3-Pane)"
+        >
+          <FiGrid size={15} />
+          <span>Chat View</span>
+        </button>
+        <button
+          type="button"
+          className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
+          onClick={() => setViewMode("list")}
+          title="Full List View"
+        >
+          <FiList size={15} />
+          <span>List View</span>
+        </button>
       </div>
     </div>
 
