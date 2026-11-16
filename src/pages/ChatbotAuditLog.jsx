@@ -587,21 +587,21 @@ export default function ChatbotAuditLog() {
         <div className="view-mode-toggle-group">
           <button
             type="button"
-              className={`view-toggle-btn ${viewMode === "split" ? "active" : ""}`}
-              onClick={() => setViewMode("split")}
-              title="Chat View (3-Pane)"
-            >
-              <FiGrid size={16} />
-            </button>
-            <button
-              type="button"
-              className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
-              onClick={() => setViewMode("list")}
-              title="List View"
-            >
-              <FiList size={16} />
-            </button>
-          </div>
+            className={`view-toggle-btn ${viewMode === "split" ? "active" : ""}`}
+            onClick={() => setViewMode("split")}
+            title="Chat View (3-Pane)"
+          >
+            <FiGrid size={14} />
+          </button>
+          <button
+            type="button"
+            className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
+            onClick={() => setViewMode("list")}
+            title="List View"
+          >
+            <FiList size={14} />
+          </button>
+        </div>
       </div>
 
       {/* CONTENT AREA: LIST VIEW TABLE OR 3-PANE SPLIT VIEW */}

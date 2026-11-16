@@ -8,16 +8,17 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 12px !important;
+  gap: 4px !important;
   height: 32px !important;
-  width: auto !important;
-  min-width: 110px !important;
-  padding: 0 14px !important;
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  padding: 0 10px !important;
   border: 1px solid #cbd5e1 !important;
   border-radius: 6px !important;
   background-color: #ffffff !important;
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-  font-size: 14px !important;
+  font-size: 13.5px !important;
   font-weight: 400 !important;
   line-height: 30px !important;
   letter-spacing: 0.1px !important;
@@ -26,7 +27,9 @@
   outline: none !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   transition: all 0.15s ease-in-out !important;
-  box-sizing: border-border-box !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .dropdown-pill-text {
@@ -101,6 +104,9 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.12s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .custom-dropdown-item:hover {
@@ -1372,40 +1378,44 @@
   color: #045c99;
 }
 
-/* View Mode Toggle Group - Styled matching square arrow buttons */
+/* View Mode Toggle Group - Segmented Pill Container */
 .view-mode-toggle-group {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 2px !important;
   flex-shrink: 0 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 3px 4px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .view-toggle-btn {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
+  width: 26px !important;
+  height: 24px !important;
   padding: 0 !important;
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 8px !important;
-  color: #475569 !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 5px !important;
+  color: #64748b !important;
   cursor: pointer !important;
   transition: all 0.15s ease !important;
 }
 
 .view-toggle-btn:hover {
-  background-color: #f8fafc !important;
-  border-color: #94a3b8 !important;
+  background-color: #f1f5f9 !important;
   color: #0f172a !important;
 }
 
 .view-toggle-btn.active {
-  background-color: #ffffff !important;
+  background-color: #e0f2fe !important;
   border-color: #045c99 !important;
   color: #045c99 !important;
-  box-shadow: 0 0 0 1px #045c99 !important;
+  font-weight: 600 !important;
 }
 
 
