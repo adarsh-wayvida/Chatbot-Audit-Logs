@@ -31,6 +31,17 @@ const getLastMessageText = (session) => {
   return lastMsg.text;
 };
 
+const getLastUserMessageText = (session) => {
+  const msgs = session.messages || messagesMap[session.sessionId] || [];
+  if (msgs.length === 0) return session.intent || "No messages";
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    if (msgs[i].role === "user") {
+      return msgs[i].text;
+    }
+  }
+  return msgs[0]?.text || "No messages";
+};
+
 const getDeviceIcon = (device) => {
   const dev = (device || "").toLowerCase();
   if (dev.includes("android") || dev.includes("iphone") || dev.includes("mobile") || dev.includes("phone")) {
@@ -282,8 +293,23 @@ export default function ChatbotAuditLog() {
   // View mode toggle state ('split' = 3-pane WhatsApp view, 'list' = Table / List view)
   const [viewMode, setViewMode] = useState("split");
 
+  // CRM Push Status filter state
+  const [statusFilter, setStatusFilter] = useState("All");
+
   // Feature 2: Bot Stuck filter
   const [stuckFilter, setStuckFilter] = useState("All");
+
+  // Sorting state for List View table
+  const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
+
+  const handleSort = (field) => {
+    setSortConfig((prev) => {
+      if (prev.field === field) {
+        return { field, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      return { field, direction: 'asc' };
+    });
+  };
 
   // Export Menu Dropdown State
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -388,7 +414,26 @@ export default function ChatbotAuditLog() {
     return true;
   });
 
-  const activeSession = filteredLogs.find(s => s.sessionId === selectedSessionId) || filteredLogs[0] || auditLogData[0];
+  const sortedLogs = React.useMemo(() => {
+    if (!sortConfig.field) return filteredLogs;
+    return [...filteredLogs].sort((a, b) => {
+      let aVal, bVal;
+      if (sortConfig.field === "leadScore") {
+        aVal = a.leadScore ?? 50;
+        bVal = b.leadScore ?? 50;
+      } else if (sortConfig.field === "datetime") {
+        aVal = new Date(a.datetime).getTime() || 0;
+        bVal = new Date(b.datetime).getTime() || 0;
+      } else {
+        return 0;
+      }
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredLogs, sortConfig]);
+
+  const activeSession = sortedLogs.find(s => s.sessionId === selectedSessionId) || sortedLogs[0] || auditLogData[0];
   const activeMessages = activeSession?.messages || messagesMap[activeSession?.sessionId] || [];
 
   const [openToken, setOpenToken] = useState(null);
@@ -411,15 +456,14 @@ export default function ChatbotAuditLog() {
   return (
     <div className="audit-log-page">
       <div className="audit-top-header-row">
-        <div className="audit-header-left-group">
-          <h2 className="audit-log-title">
-            Chatbot Audit Logs ({filteredLogs.length})
-          </h2>
+        <h2 className="audit-log-title">
+          Chatbot Audit Logs ({sortedLogs.length})
+        </h2>
 
-          {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
-          <div className="audit-filter-bar">
-        <CustomDropdownPill
-          label="All Platform"
+        {/* FILTER BAR WITH CUSTOM DROPDOWN PILLS */}
+        <div className="audit-filter-bar">
+          <CustomDropdownPill
+            label="All Platform"
           selectedValue={platformFilter}
           onChange={setPlatformFilter}
           options={[
@@ -538,32 +582,145 @@ export default function ChatbotAuditLog() {
           )}
         />
         </div>
+
+        {/* VIEW MODE TOGGLE BUTTONS (Segmented Control - Icons Only) */}
+        <div className="view-mode-toggle-group">
+          <button
+            type="button"
+              className={`view-toggle-btn ${viewMode === "split" ? "active" : ""}`}
+              onClick={() => setViewMode("split")}
+              title="Chat View (3-Pane)"
+            >
+              <FiGrid size={16} />
+            </button>
+            <button
+              type="button"
+              className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
+              onClick={() => setViewMode("list")}
+              title="List View"
+            >
+              <FiList size={16} />
+            </button>
+          </div>
       </div>
 
-      {/* VIEW MODE TOGGLE BUTTONS (Segmented Control at Extreme Right) */}
-      <div className="view-mode-toggle-group">
-        <button
-          type="button"
-          className={`view-toggle-btn ${viewMode === "split" ? "active" : ""}`}
-          onClick={() => setViewMode("split")}
-          title="Split Chat View (3-Pane)"
-        >
-          <FiGrid size={15} />
-          <span>Chat View</span>
-        </button>
-        <button
-          type="button"
-          className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
-          onClick={() => setViewMode("list")}
-          title="Full List View"
-        >
-          <FiList size={15} />
-          <span>List View</span>
-        </button>
-      </div>
-    </div>
-
-      {/* 3-PANE WHATSAPP CRM LAYOUT */}
+      {/* CONTENT AREA: LIST VIEW TABLE OR 3-PANE SPLIT VIEW */}
+      {viewMode === "list" ? (
+        <div className="audit-table-container">
+          <table className="audit-list-table">
+            <thead>
+              <tr>
+                <th>User Details</th>
+                <th>User Type</th>
+                <th>Institute</th>
+                <th>Last Message</th>
+                <th>Final Intent</th>
+                <th
+                  className="sortable-header"
+                  onClick={() => handleSort("leadScore")}
+                  style={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  <div className="header-sort-content">
+                    <span>Lead Score</span>
+                    <span className="sort-icon-group">
+                      <span className={`sort-arrow up ${sortConfig.field === "leadScore" && sortConfig.direction === "asc" ? "active" : ""}`}>▲</span>
+                      <span className={`sort-arrow down ${sortConfig.field === "leadScore" && sortConfig.direction === "desc" ? "active" : ""}`}>▼</span>
+                    </span>
+                  </div>
+                </th>
+                <th>Recommended Pitch for Sales</th>
+                <th>CRM Status</th>
+                <th
+                  className="sortable-header"
+                  onClick={() => handleSort("datetime")}
+                  style={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  <div className="header-sort-content">
+                    <span>Last Activity</span>
+                    <span className="sort-icon-group">
+                      <span className={`sort-arrow up ${sortConfig.field === "datetime" && sortConfig.direction === "asc" ? "active" : ""}`}>▲</span>
+                      <span className={`sort-arrow down ${sortConfig.field === "datetime" && sortConfig.direction === "desc" ? "active" : ""}`}>▼</span>
+                    </span>
+                  </div>
+                </th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedLogs.map((session) => {
+                const avatar = getUserAvatar(session.users);
+                const isPushed = sessionStatuses[session.sessionId] === "Pushed";
+                const lastUserMsg = getLastUserMessageText(session);
+                return (
+                  <tr key={session.sessionId} className="audit-table-row">
+                    <td>
+                      <div className="table-user-cell">
+                        {avatar ? (
+                          <img src={avatar} alt={session.users} className="table-avatar-img" />
+                        ) : (
+                          <div className="table-avatar-circle">
+                            {session.users ? session.users.charAt(0).toUpperCase() : "U"}
+                          </div>
+                        )}
+                        <div className="table-user-info">
+                          <span className="table-user-name">
+                            {session.users === "guest" ? "guest (public)" : session.users}
+                          </span>
+                          <span className="table-platform-badge">{session.platformType}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`table-type-pill ${session.users === "guest" ? "guest" : "registered"}`}>
+                        {session.users === "guest" ? "Guest" : "Registered"}
+                      </span>
+                    </td>
+                    <td>{session.platformType === "Marketplace" ? "Wayvida" : session.instituteId || "NA"}</td>
+                    <td>
+                      <div className="table-last-msg-cell" title={lastUserMsg}>
+                        <span className="last-msg-text">{lastUserMsg}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="table-intent-text">{session.finalIntent || session.intent || "General Inquiry"}</span>
+                    </td>
+                    <td>
+                      {(() => {
+                        const score = session.leadScore ?? 50;
+                        const scoreColor = score >= 75 ? "#16a34a" : score >= 45 ? "#d97706" : "#64748b";
+                        return (
+                          <span className="table-lead-score-value" style={{ color: scoreColor, fontWeight: "700", fontSize: "14px" }}>
+                            {score}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td>{session.recommendedPitch || "N/A"}</td>
+                    <td>
+                      <span className={`table-crm-badge ${isPushed ? "pushed" : "not-pushed"}`}>
+                        {isPushed ? "Already Pushed to CRM" : "Push Lead to CRM"}
+                      </span>
+                    </td>
+                    <td>{session.datetime}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="table-action-btn"
+                        onClick={() => {
+                          setSelectedSessionId(session.sessionId);
+                          setViewMode("split");
+                        }}
+                      >
+                        View Chat in Whatsapp Mode
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
       <div className="whatsapp-crm-container">
         {/* Pane 1: Session List */}
         <div className="pane-session-list">
@@ -691,13 +848,9 @@ export default function ChatbotAuditLog() {
 
                   {/* Push Lead to CRM Button in Chat Header */}
                   <button
-                    className={`push-crm-header-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed disabled" : ""}`}
-                    disabled={sessionStatuses[activeSession?.sessionId] === "Pushed"}
-                    onClick={() => {
-                      if (sessionStatuses[activeSession?.sessionId] !== "Pushed") {
-                        setSessionStatuses(prev => ({ ...prev, [activeSession?.sessionId]: "Pushed" }));
-                      }
-                    }}
+                    type="button"
+                    disabled
+                    className={`push-crm-header-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed" : "not-pushed"}`}
                   >
                     {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
                   </button>
@@ -941,6 +1094,7 @@ export default function ChatbotAuditLog() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

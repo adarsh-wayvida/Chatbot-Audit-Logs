@@ -8,12 +8,13 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 8px !important;
-  height: 38px !important;
-  width: 142px !important;
-  padding: 0 12px !important;
+  gap: 12px !important;
+  height: 32px !important;
+  width: auto !important;
+  min-width: 110px !important;
+  padding: 0 14px !important;
   border: 1px solid #cbd5e1 !important;
-  border-radius: 10px !important;
+  border-radius: 6px !important;
   background-color: #ffffff !important;
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
   font-size: 14px !important;
@@ -38,7 +39,7 @@
 
 .chevron-icon {
   flex-shrink: 0 !important;
-  color: #0284c7 !important;
+  color: #455560 !important; /* Matches filter text color exactly */
   transition: transform 0.2s ease !important;
 }
 
@@ -50,21 +51,21 @@
 
 .custom-dropdown-pill.active,
 .custom-dropdown-pill.selected-active {
-  border-color: #045C99 !important;
-  background-color: #f0f9ff !important;
-  color: #045C99 !important;
-  font-weight: 600 !important;
-  line-height: 21px !important;
-  letter-spacing: 0.1px !important;
+  border-color: #045c99 !important;
+  background-color: #ffffff !important;
+  color: #455560 !important;
+  font-weight: 400 !important;
+  box-shadow: none !important;
 }
 
 .chevron-icon {
-  color: #0284c7 !important;
+  color: #455560 !important; /* Matches filter text color exactly */
   transition: transform 0.2s ease !important;
 }
 
 .chevron-icon.rotate {
   transform: rotate(180deg) !important;
+  color: #455560 !important; /* Matches filter text color exactly */
 }
 
 /* Dropdown Menu Popup - Exactly matching Image 1 */
@@ -72,7 +73,9 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  min-width: 170px;
+  min-width: 180px !important;
+  width: max-content !important;
+  max-width: 260px !important;
   background: #ffffff;
   border: 1px solid #e0f2fe;
   border-radius: 12px;
@@ -364,16 +367,16 @@
   display: flex !important;
   flex-wrap: nowrap !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 12px !important;
   margin-bottom: 0 !important;
 }
 
 .audit-filter-input,
 .audit-filter-btn {
-  height: 38px !important;
+  height: 32px !important;
   padding: 0 14px !important;
   border: 1px solid #cbd5e1 !important;
-  border-radius: 10px !important;
+  border-radius: 6px !important;
   background-color: #ffffff !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
@@ -393,11 +396,11 @@
 }
 
 .audit-filter-btn {
-  height: 38px !important;
+  height: 32px !important;
   padding: 0 16px !important;
   cursor: pointer !important;
   border: 1px solid #cbd5e1 !important;
-  border-radius: 10px !important;
+  border-radius: 6px !important;
   background-color: #ffffff !important;
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
   font-size: 14px !important;
@@ -471,7 +474,9 @@
   outline: none;
   font-size: 13px;
   color: #1e293b;
-  width: 100%;
+  min-width: 180px !important;
+  width: max-content !important;
+  max-width: 260px !important;
 }
 
 .whatsapp-search-input::placeholder {
@@ -510,9 +515,10 @@
   background: #f8fafc;
 }
 
-.session-card-item.active {
-  background: #f0f9ff;
-  border-left: 3px solid #009be6;
+.session-card-item.active,
+.session-item.active {
+  background-color: #e0f2fe !important;
+  border-bottom: 1px solid #bae6fd !important;
 }
 
 .user-avatar-photo {
@@ -593,7 +599,7 @@
   height: 40px;
   border-radius: 50%;
   background: #e0f2fe;
-  color: #0284c7;
+  color: #045c99;
   font-weight: 700;
   font-size: 15px;
   display: flex;
@@ -718,7 +724,7 @@
 .assistant-row { align-items: flex-start; flex-direction: row; gap: 10px; }
 
 .user-bubble {
-  background: #009be6;
+  background: #045c99;
   color: #ffffff;
   padding: 10px 14px;
   border-radius: 14px 14px 2px 14px;
@@ -740,7 +746,7 @@
 }
 
 .intent-highlight {
-  color: #0284c7;
+  color: #045c99;
   font-weight: 600;
 }
 
@@ -777,9 +783,9 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background-color: #f0f7ff;
-  border: 1px solid #d0e1fd;
-  color: #1d4ed8;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #045c99;
   border-radius: 10px;
   padding: 6px 14px;
   font-size: 13px;
@@ -789,8 +795,8 @@
 }
 
 .quick-reply-pill:hover {
-  background-color: #e0edff;
-  border-color: #b8d5fc;
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
 }
 
 .assistant-meta-footer {
@@ -859,8 +865,8 @@
 /* AI Sales Intelligence Banner */
 .ai-sales-intelligence-banner {
   background: rgba(255, 255, 255, 0.98) !important;
-  border: 1.5px solid #3b82f6 !important;
-  box-shadow: 0 8px 20px -4px rgba(59, 130, 246, 0.15) !important;
+  border: 1.5px solid #045c99 !important;
+  box-shadow: 0 8px 20px -4px rgba(4, 92, 153, 0.15) !important;
   border-radius: 12px !important;
   padding: 12px 16px !important;
   margin: 12px !important;
@@ -877,7 +883,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #2563eb;
+  color: #045c99;
   font-weight: 700;
   font-size: 13px;
 }
@@ -1003,7 +1009,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #0284c7;
+  color: #045c99;
   margin-left: 4px;
 }
 
@@ -1116,7 +1122,9 @@
 }
 
 .dropdown-search-input {
-  width: 100%;
+  min-width: 180px !important;
+  width: max-content !important;
+  max-width: 260px !important;
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #cbd5e1;
@@ -1200,8 +1208,62 @@
 
 
 .chat-pane-header-right {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.push-crm-header-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 27px !important;
+  padding: 0 14px !important;
+  border-radius: 20px !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.15s ease !important;
+}
+
+.push-crm-header-btn.not-pushed {
+  background-color: #f0f9ff !important;
+  border: 1.5px solid #045c99 !important;
+  color: #045c99 !important;
+  font-weight: 600 !important;
+}
+
+.push-crm-header-btn.pushed {
+  background-color: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+.export-menu-dots-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 27px !important;
+  height: 27px !important;
+  padding: 0 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: all 0.15s ease !important;
+}
+
+.export-menu-dots-btn:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
 }
 
 /* Push Lead to CRM Button in Chat Pane Header */
@@ -1269,8 +1331,8 @@
 .export-menu-dots-btn:hover,
 .export-menu-dots-btn.active {
   background: #f8fafc;
-  color: #0284c7;
-  border-color: #0284c7;
+  color: #045c99;
+  border-color: #045c99;
 }
 
 .export-dropdown-menu {
@@ -1288,7 +1350,9 @@
 }
 
 .export-dropdown-item {
-  width: 100%;
+  min-width: 180px !important;
+  width: max-content !important;
+  max-width: 260px !important;
   display: flex;
   align-items: center;
   padding: 8px 10px;
@@ -1305,44 +1369,347 @@
 
 .export-dropdown-item:hover {
   background: #f1f5f9;
-  color: #0284c7;
+  color: #045c99;
 }
 
-/* View Mode Segmented Control at Top Header Right */
+/* View Mode Toggle Group - Styled matching square arrow buttons */
 .view-mode-toggle-group {
-  display: flex;
-  align-items: center;
-  background: #e2e8f0;
-  padding: 3px;
-  border-radius: 10px;
-  gap: 2px;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
 }
 
 .view-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
 }
 
 .view-toggle-btn:hover {
-  color: #1e293b;
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
 }
 
 .view-toggle-btn.active {
-  background: #ffffff;
-  color: #0284c7;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff !important;
+  border-color: #045c99 !important;
+  color: #045c99 !important;
+  box-shadow: 0 0 0 1px #045c99 !important;
 }
+
+
+/* ==========================================================================
+   AUDIT LIST VIEW TABLE STYLES (Matching Admin Panel Table Design Specs)
+   ========================================================================== */
+
+.audit-table-container {
+  width: 100% !important;
+  max-height: calc(100vh - 120px) !important;
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  overflow: auto !important;
+  margin-top: 12px !important;
+  margin-bottom: 0 !important;
+  scroll-snap-type: x mandatory !important;
+  scroll-padding-left: 200px !important;
+}
+
+.audit-list-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  text-align: left !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+/* Header Row Specs (#e8f2fa background, 14px, #1D1D1F) */
+.audit-list-table thead tr {
+  background-color: #e8f2fa !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+}
+
+.audit-list-table th {
+  padding: 8px 12px !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #1D1D1F !important;
+  line-height: 20px !important;
+  letter-spacing: 0.2px !important;
+  white-space: nowrap !important;
+  border-right: 1px solid #d0e1fd !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background-color: #e8f2fa !important;
+}
+
+.audit-list-table th:not(:first-child) {
+  scroll-snap-align: start !important;
+  scroll-margin-left: 200px !important;
+}
+
+.audit-list-table th:last-child {
+  border-right: none !important;
+}
+
+/* Sticky First Column ("User Details") */
+.audit-list-table th:first-child {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 20 !important;
+  background-color: #e8f2fa !important;
+  border-right: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  min-width: 200px !important;
+  width: 200px !important;
+}
+
+.audit-list-table td:first-child {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 5 !important;
+  background-color: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+  min-width: 200px !important;
+  width: 200px !important;
+}
+
+.audit-table-row:hover td:first-child {
+  background-color: #f4f8fc !important;
+}
+
+/* Table Body Cell Specs (14px, #495761) */
+.audit-list-table td {
+  padding: 8px 12px !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #495761 !important;
+  line-height: 20px !important;
+  letter-spacing: 0.2px !important;
+  border-right: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+
+.audit-list-table td:not(:first-child) {
+  scroll-snap-align: start !important;
+  scroll-margin-left: 200px !important;
+}
+
+.audit-list-table td:last-child {
+  border-right: none !important;
+}
+
+.audit-table-row {
+  transition: background-color 0.15s ease !important;
+  cursor: default !important;
+}
+
+.audit-table-row:hover {
+  background-color: #f4f8fc !important;
+}
+
+/* Cell Specific Components */
+.table-user-cell {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.table-avatar-img {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.table-avatar-circle {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+.table-user-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.table-user-name {
+  font-weight: 500 !important;
+  color: #1D1D1F !important;
+  font-size: 14px !important;
+}
+
+.table-platform-badge {
+  font-size: 11px !important;
+  color: #045c99 !important;
+  background-color: #f0f9ff !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+  width: fit-content !important;
+}
+
+.table-type-pill {
+  padding: 3px 8px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  display: inline-block !important;
+}
+
+.table-type-pill.guest {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+.table-type-pill.registered {
+  background-color: #f0f9ff !important;
+  color: #045c99 !important;
+}
+
+.table-lead-score-pill {
+  background-color: #f0fdf4 !important;
+  color: #166534 !important;
+  border: 1px solid #bbf7d0 !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  display: inline-block !important;
+}
+
+.table-intent-text {
+  font-size: 14px !important;
+  color: #495761 !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  line-height: 20px !important;
+}
+
+.table-crm-badge {
+  padding: 4px 10px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  display: inline-block !important;
+}
+
+.table-crm-badge.pushed {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.table-crm-badge.not-pushed {
+  background-color: #f0f9ff !important;
+  color: #045c99 !important;
+  border: 1px solid #045c99 !important;
+}
+
+.table-action-btn {
+  background-color: #045c99 !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 5px 12px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.table-action-btn:hover {
+  background-color: #03467b !important;
+}
+
+
+.table-last-msg-cell {
+  display: block !important;
+  max-width: 160px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.last-msg-sender-tag {
+  font-weight: 600 !important;
+  color: #045c99 !important;
+  font-size: 12px !important;
+  background-color: #f0f9ff !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.last-msg-text {
+  color: #495761 !important;
+  font-size: 14px !important;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  line-height: 20px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Sortable Header Styles */
+.header-sort-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 6px !important;
+}
+
+.sort-icon-group {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-size: 8px !important;
+  line-height: 1 !important;
+  gap: 3px !important;
+  margin-left: 6px !important;
+}
+
+.sort-arrow {
+  display: block !important;
+  color: #1d1d1f !important;
+  opacity: 0.9 !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.sort-arrow.active {
+  color: #045c99 !important;
+  opacity: 1 !important;
+}
+
+
+
+

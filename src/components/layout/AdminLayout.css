@@ -98,7 +98,6 @@ body, html {
   background-color: #EBF4FA;
   color: #045C99;
   font-weight: 500;
-  border-right: 3px solid #045C99;
 }
 
 .nav-item.active .nav-icon {
