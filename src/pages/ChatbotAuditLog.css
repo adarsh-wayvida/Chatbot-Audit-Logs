@@ -1378,7 +1378,179 @@
   color: #045c99;
 }
 
-/* View Mode Toggle Group - Segmented Pill Container */
+/* Sub-header Bar (Row 2 below Title & Filters) */
+.audit-subheader-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 4px !important;
+  margin-bottom: 2px !important;
+  padding: 0 4px !important;
+}
+
+.bulk-selection-info-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.selection-pill-box {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background-color: #f0f9ff !important;
+  border: 1px solid #bae6fd !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+  color: #0369a1 !important;
+}
+
+.selection-count-badge {
+  font-weight: 700 !important;
+  background-color: #e0f2fe !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+}
+
+.selection-text {
+  font-weight: 500 !important;
+}
+
+.clear-selection-x-btn {
+  background: none !important;
+  border: none !important;
+  color: #0284c7 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  padding: 0 2px !important;
+  line-height: 1 !important;
+}
+
+.clear-selection-x-btn:hover {
+  color: #0369a1 !important;
+}
+
+.select-all-total-btn {
+  background-color: #045c99 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 5px 12px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.select-all-total-btn:hover {
+  background-color: #034878 !important;
+}
+
+/* Bulk Export Button & Dropdown matching Image 2 & Image 3 */
+.bulk-export-container {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.bulk-export-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 30px !important;
+  padding: 0 12px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.bulk-export-btn:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+.bulk-export-btn.active {
+  border-color: #045c99 !important;
+  color: #045c99 !important;
+}
+
+.bulk-export-dropdown-menu {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  right: 0 !important;
+  width: 170px !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1) !important;
+  padding: 4px 0 !important;
+  z-index: 200 !important;
+}
+
+.bulk-export-item {
+  padding: 8px 16px !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  color: #1e293b !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.bulk-export-item:hover {
+  background-color: #f1f5f9 !important;
+  color: #045c99 !important;
+}
+
+/* Checkbox styling matching Image 1 */
+.checkbox-col {
+  width: 24px !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  text-align: center !important;
+  padding: 0 !important;
+}
+
+.custom-table-checkbox {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 1px solid #94a3b8 !important;
+  border-radius: 4px !important;
+  background-color: #ffffff !important;
+  cursor: pointer !important;
+  position: relative !important;
+  vertical-align: middle !important;
+  transition: all 0.15s ease !important;
+}
+
+.custom-table-checkbox:checked {
+  background-color: #045c99 !important;
+  border-color: #045c99 !important;
+}
+
+.custom-table-checkbox:checked::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 4px !important;
+  top: 1px !important;
+  width: 4px !important;
+  height: 8px !important;
+  border: solid #ffffff !important;
+  border-width: 0 2px 2px 0 !important;
+  transform: rotate(45deg) !important;
+}
+
+.audit-table-row.selected-row {
+  background-color: #f0f9ff !important;
+}
 .view-mode-toggle-group {
   display: flex !important;
   align-items: center !important;
@@ -1477,11 +1649,41 @@
   border-right: none !important;
 }
 
-/* Sticky First Column ("User Details") */
-.audit-list-table th:first-child {
+/* Sticky First Column Checkbox */
+.audit-list-table th.checkbox-col {
   position: sticky !important;
   top: 0 !important;
   left: 0 !important;
+  z-index: 20 !important;
+  background-color: #e8f2fa !important;
+  border-right: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  min-width: 36px !important;
+  width: 36px !important;
+  max-width: 36px !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+.audit-list-table td.checkbox-col {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 5 !important;
+  background-color: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+  min-width: 36px !important;
+  width: 36px !important;
+  max-width: 36px !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+/* Sticky Second Column ("User Details") */
+.audit-list-table th:nth-child(2) {
+  position: sticky !important;
+  top: 0 !important;
+  left: 36px !important;
   z-index: 20 !important;
   background-color: #e8f2fa !important;
   border-right: 1px solid #cbd5e1 !important;
@@ -1490,9 +1692,9 @@
   width: 200px !important;
 }
 
-.audit-list-table td:first-child {
+.audit-list-table td:nth-child(2) {
   position: sticky !important;
-  left: 0 !important;
+  left: 36px !important;
   z-index: 5 !important;
   background-color: #ffffff !important;
   border-right: 1px solid #e2e8f0 !important;
@@ -1501,7 +1703,8 @@
   width: 200px !important;
 }
 
-.audit-table-row:hover td:first-child {
+.audit-table-row:hover td.checkbox-col,
+.audit-table-row:hover td:nth-child(2) {
   background-color: #f4f8fc !important;
 }
 

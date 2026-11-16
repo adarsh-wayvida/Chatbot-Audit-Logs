@@ -268,6 +268,9 @@ function DualMonthCalendarPicker({ onSelectRange, onClose }) {
 export default function ChatbotAuditLog() {
   const [sessions] = useState(auditLogData);
   const [selectedSessionId, setSelectedSessionId] = useState(auditLogData[0]?.sessionId);
+  const [selectedRowIds, setSelectedRowIds] = useState([]);
+  const [showBulkExportMenu, setShowBulkExportMenu] = useState(false);
+  const bulkExportRef = useRef(null);
 
   const [sessionStatuses, setSessionStatuses] = useState(() => {
     const map = {};
@@ -320,10 +323,74 @@ export default function ChatbotAuditLog() {
       if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
         setShowExportMenu(false);
       }
+      if (bulkExportRef.current && !bulkExportRef.current.contains(e.target)) {
+        setShowBulkExportMenu(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSelectAllRows = () => {
+    if (selectedRowIds.length === sortedLogs.length) {
+      setSelectedRowIds([]);
+    } else {
+      setSelectedRowIds(sortedLogs.map(s => s.sessionId));
+    }
+  };
+
+  const handleSelectRow = (id) => {
+    setSelectedRowIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkExportCSV = () => {
+    const targetSessions = selectedRowIds.length > 0 
+      ? sortedLogs.filter(s => selectedRowIds.includes(s.sessionId))
+      : sortedLogs;
+    
+    let csvRows = ["Session ID,User,Platform,Institute,Lead Score,Final Intent,CRM Status,Last Activity,Last Message"];
+    targetSessions.forEach(s => {
+      const lastMsg = getLastUserMessageText(s).replace(/"/g, '""');
+      const row = [
+        `"${s.sessionId}"`,
+        `"${s.users}"`,
+        `"${s.platformType}"`,
+        `"${s.platformType === "Marketplace" ? "Wayvida" : s.instituteId || "NA"}"`,
+        `"${s.leadScore ?? 50}"`,
+        `"${s.finalIntent || s.intent || ""}"`,
+        `"${sessionStatuses[s.sessionId] || "Not Pushed"}"`,
+        `"${s.datetime}"`,
+        `"${lastMsg}"`
+      ];
+      csvRows.push(row.join(","));
+    });
+
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `chatbot_audit_logs_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowBulkExportMenu(false);
+  };
+
+  const handleBulkExportJSON = () => {
+    const targetSessions = selectedRowIds.length > 0 
+      ? sortedLogs.filter(s => selectedRowIds.includes(s.sessionId))
+      : sortedLogs;
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(targetSessions, null, 2));
+    const link = document.createElement("a");
+    link.href = dataStr;
+    link.setAttribute("download", `chatbot_audit_logs_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowBulkExportMenu(false);
+  };
 
   const handleExportCSV = (session, messages) => {
     if (!session) return;
@@ -606,10 +673,75 @@ export default function ChatbotAuditLog() {
 
       {/* CONTENT AREA: LIST VIEW TABLE OR 3-PANE SPLIT VIEW */}
       {viewMode === "list" ? (
-        <div className="audit-table-container">
+        <>
+          {/* SUB-HEADER ROW: BULK ACTIONS BAR (ROW 2 - ONLY SHOWN IN LIST MODE WHEN AT LEAST 1 ITEM IS CHECKED) */}
+          {selectedRowIds.length > 0 && (
+            <div className="audit-subheader-bar">
+              <div className="bulk-selection-info-group">
+                <div className="selection-pill-box">
+                  <span className="selection-count-badge">{selectedRowIds.length}</span>
+                  <span className="selection-text">Selected</span>
+                  <button
+                    type="button"
+                    className="clear-selection-x-btn"
+                    onClick={() => setSelectedRowIds([])}
+                    title="Clear selection"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="select-all-total-btn"
+                  onClick={handleSelectAllRows}
+                >
+                  {sortedLogs.length} Select All
+                </button>
+              </div>
+
+              {/* EXPORT DROPDOWN MENU */}
+              <div className="bulk-export-container" ref={bulkExportRef}>
+                <button
+                  type="button"
+                  className={`bulk-export-btn ${showBulkExportMenu ? "active" : ""}`}
+                  onClick={() => setShowBulkExportMenu(!showBulkExportMenu)}
+                >
+                  <span>Export</span>
+                  <FiChevronDown className={`chevron-icon ${showBulkExportMenu ? "rotate" : ""}`} size={14} />
+                </button>
+
+                {showBulkExportMenu && (
+                  <div className="bulk-export-dropdown-menu">
+                    <div
+                      className="bulk-export-item"
+                      onClick={handleBulkExportCSV}
+                    >
+                      CSV
+                    </div>
+                    <div
+                      className="bulk-export-item"
+                      onClick={handleBulkExportJSON}
+                    >
+                      JSON
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="audit-table-container">
           <table className="audit-list-table">
             <thead>
               <tr>
+                <th className="checkbox-col">
+                  <input
+                    type="checkbox"
+                    className="custom-table-checkbox"
+                    checked={sortedLogs.length > 0 && selectedRowIds.length === sortedLogs.length}
+                    onChange={handleSelectAllRows}
+                  />
+                </th>
                 <th>User Details</th>
                 <th>User Type</th>
                 <th>Institute</th>
@@ -652,7 +784,15 @@ export default function ChatbotAuditLog() {
                 const isPushed = sessionStatuses[session.sessionId] === "Pushed";
                 const lastUserMsg = getLastUserMessageText(session);
                 return (
-                  <tr key={session.sessionId} className="audit-table-row">
+                  <tr key={session.sessionId} className={`audit-table-row ${selectedRowIds.includes(session.sessionId) ? "selected-row" : ""}`}>
+                    <td className="checkbox-col">
+                      <input
+                        type="checkbox"
+                        className="custom-table-checkbox"
+                        checked={selectedRowIds.includes(session.sessionId)}
+                        onChange={() => handleSelectRow(session.sessionId)}
+                      />
+                    </td>
                     <td>
                       <div className="table-user-cell">
                         {avatar ? (
@@ -720,6 +860,7 @@ export default function ChatbotAuditLog() {
             </tbody>
           </table>
         </div>
+      </>
       ) : (
       <div className="whatsapp-crm-container">
         {/* Pane 1: Session List */}
