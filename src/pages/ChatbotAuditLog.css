@@ -1385,7 +1385,7 @@
   justify-content: space-between !important;
   gap: 12px !important;
   margin-top: 4px !important;
-  margin-bottom: 2px !important;
+  margin-bottom: 4px !important;
   padding: 0 4px !important;
 }
 
@@ -1603,7 +1603,7 @@
   border: 1px solid #cbd5e1 !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   overflow: auto !important;
-  margin-top: 12px !important;
+  margin-top: 4px !important;
   margin-bottom: 0 !important;
   scroll-snap-type: x mandatory !important;
   scroll-padding-left: 200px !important;
