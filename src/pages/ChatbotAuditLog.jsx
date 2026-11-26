@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload, FiGrid, FiList, FiTag } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
 import chatbotAvatar from "../assets/Opacity 20.svg";
+import AISalesIntelligenceModal from "../components/common/AISalesIntelligenceModal";
 import "./ChatbotAuditLog.css";
 
 const getUserAvatar = (name) => {
@@ -299,6 +300,7 @@ export default function ChatbotAuditLog() {
     return map;
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   const [platformFilter, setPlatformFilter] = useState("All Platform");
   const [userTypeFilterTab, setUserTypeFilterTab] = useState("All");
@@ -1125,7 +1127,12 @@ export default function ChatbotAuditLog() {
 
           {/* Floating AI Banner (Hidden when Sidebar Pane 3 is Open) */}
           {!isSidebarOpen && (
-            <div className="ai-sales-intelligence-banner">
+            <div 
+              className="ai-sales-intelligence-banner"
+              onClick={() => setShowAiModal(true)}
+              style={{ cursor: "pointer" }}
+              title="Click to view full AI Sales Intelligence report"
+            >
               <div className="ai-banner-header">
                 <div className="ai-banner-title">
                   <svg className="w-4 h-4 text-blue-500 inline" fill="currentColor" viewBox="0 0 20 20" style={{ width: '16px', height: '16px', color: '#3b82f6' }}>
@@ -1265,6 +1272,13 @@ export default function ChatbotAuditLog() {
           </div>
         )}
       </div>
+      )}
+
+      {showAiModal && activeSession && (
+        <AISalesIntelligenceModal
+          session={activeSession}
+          onClose={() => setShowAiModal(false)}
+        />
       )}
     </div>
   );
