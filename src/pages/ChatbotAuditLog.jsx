@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload, FiGrid, FiList, FiTag } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
-import AISalesIntelligenceModal from "../components/common/AISalesIntelligenceModal";
 import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
 
@@ -149,14 +148,6 @@ function CustomDropdownPill({ label, options, selectedValue, onChange, customFoo
           )}
         </div>
       )}
-
-      {/* AI Sales Intelligence Detailed Modal */}
-      {showAiModal && activeSession && (
-        <AISalesIntelligenceModal
-          session={activeSession}
-          onClose={() => setShowAiModal(false)}
-        />
-      )}
     </div>
   );
 }
@@ -294,7 +285,6 @@ function DualMonthCalendarPicker({ onSelectRange, onClose }) {
 export default function ChatbotAuditLog() {
   const [sessions] = useState(auditLogData);
   const [selectedSessionId, setSelectedSessionId] = useState(auditLogData[0]?.sessionId);
-  const [showAiModal, setShowAiModal] = useState(false);
   const [selectedRowIds, setSelectedRowIds] = useState([]);
   const [showBulkExportMenu, setShowBulkExportMenu] = useState(false);
   const bulkExportRef = useRef(null);
@@ -1135,12 +1125,7 @@ export default function ChatbotAuditLog() {
 
           {/* Floating AI Banner (Hidden when Sidebar Pane 3 is Open) */}
           {!isSidebarOpen && (
-            <div 
-              className="ai-sales-intelligence-banner" 
-              onClick={() => setShowAiModal(true)} 
-              style={{ cursor: "pointer" }}
-              title="Click to view full AI Sales Intelligence & user contact info"
-            >
+            <div className="ai-sales-intelligence-banner">
               <div className="ai-banner-header">
                 <div className="ai-banner-title">
                   <svg className="w-4 h-4 text-blue-500 inline" fill="currentColor" viewBox="0 0 20 20" style={{ width: '16px', height: '16px', color: '#3b82f6' }}>
@@ -1280,14 +1265,6 @@ export default function ChatbotAuditLog() {
           </div>
         )}
       </div>
-      )}
-
-      {/* AI Sales Intelligence Detailed Modal */}
-      {showAiModal && activeSession && (
-        <AISalesIntelligenceModal
-          session={activeSession}
-          onClose={() => setShowAiModal(false)}
-        />
       )}
     </div>
   );
