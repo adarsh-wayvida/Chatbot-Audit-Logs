@@ -1,27 +1,44 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload, FiGrid, FiList } from "react-icons/fi";
+import { FiChevronDown, FiCopy, FiCheck, FiMessageSquare, FiExternalLink, FiSearch, FiMonitor, FiSmartphone, FiCalendar, FiMoreVertical, FiDownload, FiGrid, FiList, FiTag } from "react-icons/fi";
 import { auditLogData, messagesMap } from "../data/auditLogMockData";
 import chatbotAvatar from "../assets/Opacity 20.svg";
 import "./ChatbotAuditLog.css";
 
 const getUserAvatar = (name) => {
   if (!name || name === "guest") return null;
-  const males = ["Sajan", "Manukrishna", "Ratheesh Babu", "amalch", "cuser", "Developer C", "auser", "coursenls"];
+
+  // Male users list
+  const males = ["Sajan", "Manukrishna", "Ratheesh Babu", "amalch", "cuser", "Developer C", "auser", "coursenls", "Sandeep", "Snobin", "Sachin", "Noel"];
   const isMale = males.includes(name);
-  const malePhotos = [
-    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
-  ];
-  const femalePhotos = [
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-  ];
-  const pool = isMale ? malePhotos : femalePhotos;
-  const idx = name.length % pool.length;
-  return pool[idx];
+
+  // Distinct high quality male photos
+  const malePhotos = {
+    "Sajan": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    "Manukrishna": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
+    "Sandeep": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    "Snobin": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    "Sachin": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+    "Noel": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+    "Developer C": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
+    "cuser": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80"
+  };
+
+  // Distinct high quality female photos
+  const femalePhotos = {
+    "ARCHANA S": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    "Daliya C Abraham": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80",
+    "Radhika": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "Harishmitha": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
+    "aami": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80",
+    "Riya": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+    "mk company": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+  };
+
+  if (isMale) {
+    return malePhotos[name] || malePhotos["Sajan"];
+  } else {
+    return femalePhotos[name] || femalePhotos["ARCHANA S"];
+  }
 };
 
 const getLastMessageText = (session) => {
@@ -775,7 +792,6 @@ export default function ChatbotAuditLog() {
                     </span>
                   </div>
                 </th>
-                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -784,7 +800,16 @@ export default function ChatbotAuditLog() {
                 const isPushed = sessionStatuses[session.sessionId] === "Pushed";
                 const lastUserMsg = getLastUserMessageText(session);
                 return (
-                  <tr key={session.sessionId} className={`audit-table-row ${selectedRowIds.includes(session.sessionId) ? "selected-row" : ""}`}>
+                  <tr
+                    key={session.sessionId}
+                    className={`audit-table-row ${selectedRowIds.includes(session.sessionId) ? "selected-row" : ""}`}
+                    onClick={(e) => {
+                      if (e.target.tagName === "INPUT" || e.target.closest(".checkbox-col")) return;
+                      setSelectedSessionId(session.sessionId);
+                      setViewMode("split");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
                     <td className="checkbox-col">
                       <input
                         type="checkbox"
@@ -842,18 +867,6 @@ export default function ChatbotAuditLog() {
                       </span>
                     </td>
                     <td>{session.datetime}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className="table-action-btn"
-                        onClick={() => {
-                          setSelectedSessionId(session.sessionId);
-                          setViewMode("split");
-                        }}
-                      >
-                        View Chat in Whatsapp Mode
-                      </button>
-                    </td>
                   </tr>
                 );
               })}
@@ -1035,14 +1048,26 @@ export default function ChatbotAuditLog() {
 
           {/* Chat Messages Body */}
           <div className="chat-pane-messages">
-            {activeMessages.map((msg) => (
-              msg.role === "user" ? (
+            {activeMessages.map((msg) => {
+              return msg.role === "user" ? (
                 <div key={msg.id} className="chat-row user-row">
-                  <div className="user-bubble">
-                    <div className="user-text">{renderText(msg.text)}</div>
-                    <div className="user-meta">{msg.timestamp} ✓</div>
+                  <div className="user-content-wrapper">
+                    <div className="user-bubble">
+                      <div className="user-text">{renderText(msg.text)}</div>
+                    </div>
+                    <div className="user-meta">
+                      <span className="user-timestamp">{msg.timestamp}</span>
+                      {msg.intent && (
+                        <>
+                          <span className="meta-dot">•</span>
+                          <span className="intent-badge-pill">
+                            <FiTag size={12} style={{ flexShrink: 0 }} />
+                            <span>{msg.intent}</span>
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="msg-intent-under">intent: <span className="intent-highlight">{msg.intent}</span></div>
                 </div>
               ) : (
                 <div key={msg.id} className="chat-row assistant-row">
@@ -1094,8 +1119,8 @@ export default function ChatbotAuditLog() {
                     </div>
                   </div>
                 </div>
-              )
-            ))}
+              );
+            })}
           </div>
 
           {/* Floating AI Banner (Hidden when Sidebar Pane 3 is Open) */}
@@ -1173,9 +1198,14 @@ export default function ChatbotAuditLog() {
                   </div>
                   <div className="meta-detail-row">
                     <span className="meta-detail-label">CRM Status</span>
-                    <span className="meta-detail-val" style={{ fontWeight: "600", color: sessionStatuses[activeSession?.sessionId] === "Pushed" ? "#16a34a" : "#64748b" }}>
-                      {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Pushed to CRM" : "Not Pushed"}
-                    </span>
+                    <button
+                      type="button"
+                      disabled
+                      className={`push-crm-header-btn ${sessionStatuses[activeSession?.sessionId] === "Pushed" ? "pushed" : "not-pushed"}`}
+                      style={{ height: "28px", fontSize: "11px", margin: 0, padding: "0 10px", borderRadius: "6px" }}
+                    >
+                      {sessionStatuses[activeSession?.sessionId] === "Pushed" ? "Already Pushed to CRM" : "Push Lead to CRM"}
+                    </button>
                   </div>
                 </div>
               </div>
