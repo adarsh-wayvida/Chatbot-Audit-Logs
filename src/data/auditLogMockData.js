@@ -187,6 +187,8 @@ export const auditLogData = [
     "platformType": "Marketplace",
     "device": "Web",
     "leadScore": 95,
+    "userEmail": "manu@hotmail.com",
+    "userPhone": "+91 78452 54147",
     "finalIntent": "Demo & Multi-Lead Registration (Vikram Desai / Acme Logistics)",
     "recommendedPitch": "High priority lead! Follow up with Manukrishna & Vikram Desai for Data Analytics demo + GST invoice info",
     "opportunityTag": "High Value Opportunity"
